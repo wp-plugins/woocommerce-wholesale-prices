@@ -12,6 +12,8 @@ Provide special pricing to wholesale customers in WooCommerce.
 
 == DESCRIPTION ==
 
+Website: https://wholesalesuiteplugin.com
+
 WooCommerce Wholesale Prices gives WooCommerce store owners the ability to supply specific users with wholesale pricing for their product range.
 
 We've made entering wholesale prices as simple as it should be:
