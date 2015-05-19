@@ -26,7 +26,7 @@ https://wholesalesuiteplugin.com/product/woocommerce-wholesale-order-form/
 WooCommerce Wholesale Lead Capture
 https://wholesalesuiteplugin.com/product/woocommerce-wholesale-lead-capture/
 
-**WooCommerce Wholesale Prices Free Edition**
+**WOOCOMMERCE WHOLESALE PRICES FREE EDITION**
 
 ***WooCommerce Wholesale Prices*** gives WooCommerce store owners the ability to supply specific users with wholesale pricing for their product range.
 
