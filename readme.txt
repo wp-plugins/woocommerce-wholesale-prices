@@ -3,7 +3,7 @@ Contributors: jkohlbach, RymeraWebCo
 Donate link:
 Tags: woocommerce wholesale, wholesale plugin, wholesale prices, wholesale pricing, woocommerce wholesale pricing, woocommerce
 Requires at least: 3.4
-Tested up to: 4.1.2
+Tested up to: 4.2.2
 Stable tag: trunk
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -12,7 +12,21 @@ Provide special pricing to wholesale customers in WooCommerce.
 
 == DESCRIPTION ==
 
-Website: https://wholesalesuiteplugin.com
+Visit Our Website:
+https://wholesalesuiteplugin.com
+
+WooCommerce Wholesale Prices Premium add-on:
+https://wholesalesuiteplugin.com/product/woocommerce-wholesale-prices-premium/
+
+**Other premium plugins that work well with this plugin**
+
+WooCommerce Wholesale Order Form
+https://wholesalesuiteplugin.com/product/woocommerce-wholesale-order-form/
+
+WooCommerce Wholesale Lead Capture
+https://wholesalesuiteplugin.com/product/woocommerce-wholesale-lead-capture/
+
+---
 
 WooCommerce Wholesale Prices gives WooCommerce store owners the ability to supply specific users with wholesale pricing for their product range.
 
