@@ -15,7 +15,7 @@ Provide special pricing to wholesale customers in WooCommerce.
 ***VISIT OUR WEBSITE:***
 https://wholesalesuiteplugin.com
 
-***WOOCOMMERCE WHOLESALE PRICES PREMIUM ADD-ON:***
+WooCommerce Wholesale Prices Premium Add-on
 https://wholesalesuiteplugin.com/product/woocommerce-wholesale-prices-premium/
 
 ***OTHER PREMIUM PLUGINS:***
@@ -26,7 +26,7 @@ https://wholesalesuiteplugin.com/product/woocommerce-wholesale-order-form/
 WooCommerce Wholesale Lead Capture
 https://wholesalesuiteplugin.com/product/woocommerce-wholesale-lead-capture/
 
----------------------------------------
+**WooCommerce Wholesale Prices Free Edition**
 
 ***WooCommerce Wholesale Prices*** gives WooCommerce store owners the ability to supply specific users with wholesale pricing for their product range.
 
