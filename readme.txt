@@ -62,7 +62,8 @@ We'll be publishing a list of frequently asked questions in our knowledge base s
 
 == Screenshots ==
 
-Screenshots coming soon!
+Plenty of amazing screenshots for this plugin and more over at:
+https://wholesalesuiteplugin.com/product/woocommerce-wholesale-prices-premium/
 
 == Changelog ==
 
