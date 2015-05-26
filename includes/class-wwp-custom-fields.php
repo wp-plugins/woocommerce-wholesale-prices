@@ -53,6 +53,120 @@ class WWP_Custom_Fields {
     }
 
     /**
+     * Add wholesale price column to the product listing page.
+     *
+     * @param $columns
+     * @return array
+     *
+     * @since 1.0.1
+     */
+    public function addWholesalePriceListingColumn ( $columns ) {
+        $allKeys = array_keys($columns);
+        $priceIndex = array_search('price', $allKeys);
+
+        $newColumnsArray = array_slice($columns, 0, $priceIndex + 1, true) +
+            array('wholesale_price' => 'Wholesale Price') +
+            array_slice($columns, $priceIndex + 1 , NULL, true);
+
+        return $newColumnsArray;
+    }
+
+    /**
+     * Add wholesale price column data for each product on the product listing page
+     *
+     * @param $column
+     * @param $post_id
+     * @param $registeredCustomRoles
+     *
+     * @since 1.0.1
+     */
+    public function addWholesalePriceListingColumnData($column, $post_id, $registeredCustomRoles){
+        switch ( $column ) {
+            case 'wholesale_price':
+                ?>
+                <div class="wholesale_prices" id="wholesale_prices_<?php echo $post_id; ?>">
+                    <?php
+                    $product = wc_get_product($post_id);
+
+                    foreach ( $registeredCustomRoles as $roleKey => $role ) {
+
+                        // If single product, this will have a value, empty if variable product
+                        $wholesalePrice = get_post_meta($post_id, $roleKey . '_wholesale_price', true);
+
+                        if ( empty( $wholesalePrice ) ) {
+
+                            // Check for variations
+                            if ($product->product_type == 'variable') {
+                                $variations = $product->get_available_variations();
+                                $minPrice = '';
+                                $maxPrice = '';
+                                $someVariationsHaveWholesalePrice = false;
+
+                                foreach( $variations as $variation ) {
+
+                                    $variation = wc_get_product($variation['variation_id']);
+
+                                    $currVarWholesalePrice = get_post_meta($variation->variation_id, $roleKey . '_wholesale_price', true);
+
+                                    $currVarPrice = $variation->price;
+
+                                    if($variation->is_on_sale())
+                                        $currVarPrice = $variation->get_sale_price();
+
+                                    if(strcasecmp($currVarWholesalePrice,'') != 0){
+                                        $currVarPrice = $currVarWholesalePrice;
+
+                                        if(!$someVariationsHaveWholesalePrice)
+                                            $someVariationsHaveWholesalePrice = true;
+                                    }
+
+                                    if(strcasecmp($minPrice,'') == 0 || $currVarPrice < $minPrice)
+                                        $minPrice = $currVarPrice;
+
+                                    if(strcasecmp($maxPrice,'') == 0 || $currVarPrice > $maxPrice)
+                                        $maxPrice = $currVarPrice;
+
+                                }
+
+                                if ($someVariationsHaveWholesalePrice && strcasecmp($minPrice,'') != 0 && strcasecmp($maxPrice,'') != 0){
+
+                                    if ($minPrice != $maxPrice && $minPrice < $maxPrice){
+                                        $wholesalePrice = wc_price($minPrice) . ' - ';
+                                        $wholesalePrice .= wc_price($maxPrice);
+                                    } else {
+                                        $wholesalePrice = wc_price($maxPrice);
+                                    }
+
+                                }
+
+                            } else {
+                                continue;
+                            }
+                        } else {
+                            $wholesalePrice = wc_price($wholesalePrice);
+                        }
+
+                        ?>
+                        <div id="<?php echo $roleKey; ?>_wholesale_price" class="wholesale_price">
+                        <?php
+                        // Print the wholesale price
+                        echo $wholesalePrice;
+                        ?>
+                        </div>
+                    <?php
+                    }
+                    ?>
+                </div>
+                <?php
+
+                break;
+
+            default :
+                break;
+        }
+    }
+
+    /**
      * Add wholesale custom price field to variable product edit page (on the variations section).
      *
      * @param $loop

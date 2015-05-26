@@ -27,6 +27,8 @@ if ( ! class_exists( 'WWP_Settings' ) ) {
             add_action( 'woocommerce_settings_save_' . $this->id, array( $this, 'save' ) );
             add_action( 'woocommerce_sections_' . $this->id, array( $this, 'output_sections' ) );
 
+            add_action( 'woocommerce_admin_field_upsell_banner' , array( $this, 'render_upsell_banner' ) );
+
         }
 
         /**
@@ -91,6 +93,54 @@ if ( ! class_exists( 'WWP_Settings' ) ) {
             $settings = apply_filters( 'wwof_settings_section_content' , $settings, $current_section );
 
             return apply_filters( 'woocommerce_get_settings_' . $this->id, $settings, $current_section );
+
+        }
+
+
+
+
+        /*
+         |--------------------------------------------------------------------------------------------------------------
+         | Custom Settings Fields
+         |--------------------------------------------------------------------------------------------------------------
+         */
+
+        /**
+         * Render custom setting field (upsell banner)
+         *
+         * @param $value
+         * @since 1.0.1
+         */
+        public function render_upsell_banner ( $value ) {
+
+            // Custom attribute handling
+            $custom_attributes = array();
+
+            if ( ! empty( $value['custom_attributes'] ) && is_array( $value['custom_attributes'] ) ) {
+                foreach ( $value['custom_attributes'] as $attribute => $attribute_value ) {
+                    $custom_attributes[] = esc_attr( $attribute ) . '="' . esc_attr( $attribute_value ) . '"';
+                }
+            }
+
+            ob_start();
+            ?>
+            <tr valign="top">
+                <th scope="row" class="titledesc">
+                    <img src="<?php echo WWP_IMAGES_URL ?>woocommerce-wholesale-prices-upgrade-notice.jpg" alt=""/>
+                </th>
+                <th class="forminp forminp-<?php echo sanitize_title( $value['type'] ); ?>">
+                    <a style="display: inline-block; outline: none; margin-bottom: 30px;" target="_blank" href="https://wholesalesuiteplugin.com/product/woocommerce-wholesale-prices-premium/?utm_source=Free%20Plugin&utm_medium=Settings&utm_campaign=Premium%20Upsell"><img src="<?php echo WWP_IMAGES_URL ?>wholesale-suite-upsell-banner.jpg" alt="WooCommerce Wholesale Suit"/></a>
+                    <a style="display: inline-block; outline: none;" target="_blank" href="https://wholesalesuiteplugin.com/?utm_source=Free%20Plugin&utm_medium=Settings&utm_campaign=Suite%20Upsell"><img src="<?php echo WWP_IMAGES_URL ?>wholesale-suite-prices-upsell-banner.jpg" alt="WooCommerce Wholesale Prices Premium"/></a>
+                </th>
+            </tr>
+
+            <style>
+                p.submit {
+                    display: none !important;
+                }
+            </style>
+            <?php
+            echo ob_get_clean();
 
         }
 

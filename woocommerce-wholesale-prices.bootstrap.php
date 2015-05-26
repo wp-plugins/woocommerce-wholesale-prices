@@ -1,10 +1,10 @@
 <?php
 /*
 Plugin Name:    Woocommerce Wholesale Prices
-Plugin URI:     http://rymera.com.au/
+Plugin URI:     https://wholesalesuiteplugin.com
 Description:    WooCommerce Extension to Provide Wholesale Prices Functionality
 Author:         Rymera Web Co
-Version:        1.0.0
+Version:        1.0.1
 Author URI:     http://rymera.com.au/
 Text Domain:    woocommerce-wholesale-prices
 */
@@ -78,6 +78,10 @@ if ( in_array( 'woocommerce/woocommerce.php', apply_filters( 'active_plugins', g
     // This is utilized by the wwp-quick-edit.js file
     add_action( 'manage_product_posts_custom_column', array($wc_wholesale_prices,'addCustomWholesaleFieldsMetaDataOnProductListingColumn'),99,2);
 
+    // Code for adding wholesale column to product listing screen ======================================================
+
+    add_filter('manage_product_posts_columns', array($wc_wholesale_prices,'addWholesalePriceListingColumn'), 99, 1);
+	add_action('manage_product_posts_custom_column', array($wc_wholesale_prices,'addWholesalePriceListingColumnData'), 99, 2);
 
 
 
@@ -97,5 +101,27 @@ if ( in_array( 'woocommerce/woocommerce.php', apply_filters( 'active_plugins', g
 
     // Add notice to WC Widget if the user (wholesale user) fails to avail the wholesale price requirements. Only applies to wholesale users.
     add_action( 'woocommerce_before_mini_cart' , array( $wc_wholesale_prices , 'beforeWCWidget' ) );
+
+
+
+
+    // Add Custom Plugin Listing Action Links ===========================================================================
+
+    // Settings
+    add_filter( 'plugin_action_links' , array( $wc_wholesale_prices , 'addPluginListingCustomActionLinks' ) , 10 , 2 );
+
+
+
+
+    // Default Prices Settings Content =================================================================================
+
+    // If Premium Add On Isn't Present
+    if ( !in_array( 'woocommerce-wholesale-prices-premium/woocommerce-wholesale-prices-premium.bootstrap.php', apply_filters( 'active_plugins', get_option( 'active_plugins' ) ) ) ) {
+
+        $wc_wholesale_prices->activatePluginSettings();
+        add_filter( 'wwp_filter_settings_sections' , array( $wc_wholesale_prices, 'pluginSettingsSections' ), 10 , 1 );
+        add_filter( 'wwof_settings_section_content' , array( $wc_wholesale_prices, 'pluginSettingsSectionContent' ), 10, 2 );
+
+    }
 
 }

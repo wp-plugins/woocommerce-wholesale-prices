@@ -27,7 +27,7 @@ class WooCommerceWholeSalePrices {
     private $_wwp_custom_fields;
     private $_wwp_wholesale_prices;
 
-    const VERSION = '1.0.0';
+    const VERSION = '1.0.1';
 
 
 
@@ -196,6 +196,75 @@ class WooCommerceWholeSalePrices {
 
     }
 
+    /**
+     * Default prices settings content (For upsell purposes).
+     *
+     * @param $sections
+     * @return mixed
+     *
+     * @since 1.0.1
+     */
+    public function pluginSettingsSections ( $sections ) {
+
+        return $sections;
+
+    }
+
+    /**
+     * Default prices settings content (For upsell purposes).
+     *
+     * @param $settings
+     * @param $current_section
+     * @return array
+     *
+     * @since 1.0.1
+     */
+    public function pluginSettingsSectionContent ( $settings , $current_section ) {
+
+        if ( $current_section == '' ) {
+
+            // Filters Section
+            $wwpGeneralSettings = apply_filters( 'wwp_settings_general_section_settings', $this->_get_general_section_settings() ) ;
+            $settings = array_merge( $settings, $wwpGeneralSettings );
+
+        }
+
+        return $settings;
+
+    }
+
+    /**
+     * Default prices settings content (For upsell purposes).
+     *
+     * @return array
+     *
+     * @since 1.0.1
+     */
+    private function _get_general_section_settings(){
+
+        return array(
+
+            array(
+                'name'  =>  __( 'Wholesale Prices Settings', 'woocommerce-wholesale-prices' ),
+                'type'  =>  'title',
+                'desc'  =>  '',
+                'id'    =>  'wwp_settings_section_title'
+            ),
+            array(
+                'name'  =>  '',
+                'type'  =>  'upsell_banner',
+                'desc'  =>  '',
+                'id'    =>  'wwp_settings_section_general_upsell_banner',
+            ),
+            array(
+                'type'  =>  'sectionend',
+                'id'    =>  'wwp_settings_sectionend'
+            )
+
+        );
+
+    }
+
 
 
 
@@ -305,6 +374,55 @@ class WooCommerceWholeSalePrices {
     public function addCustomWholesaleFieldsMetaDataOnProductListingColumn($column,$post_id){
 
         $this->_wwp_custom_fields->addCustomWholesaleFieldsMetaDataOnProductListingColumn($column,$post_id,$this->_wwp_wholesale_roles->getAllRegisteredWholesaleRoles());
+
+    }
+
+    /**
+     * Add wholesale price column to the product listing page
+     *
+     * @param $columns
+     *
+     * @since 1.0.1
+     */
+    public function addWholesalePriceListingColumn($columns){
+
+        return $this->_wwp_custom_fields->addWholesalePriceListingColumn($columns);
+
+    }
+
+    /**
+     * Add wholesale price column to the product listing page
+     *
+     * @param $column
+     * @param $post_id
+     *
+     * @since 1.0.1
+     */
+    public function addWholesalePriceListingColumnData($column, $post_id){
+        $registeredCustomRoles = unserialize(get_option(WWP_OPTIONS_REGISTERED_CUSTOM_ROLES));
+        return $this->_wwp_custom_fields->addWholesalePriceListingColumnData($column, $post_id, $registeredCustomRoles);
+
+    }
+
+    /**
+     * Add plugin listing custom action link ( settings ).
+     *
+     * @param $links
+     * @param $file
+     * @return mixed
+     *
+     * @since 1.0.1
+     */
+    public function addPluginListingCustomActionLinks ( $links , $file ) {
+
+        if ( $file == plugin_basename( WWP_PLUGIN_PATH . 'woocommerce-wholesale-prices.bootstrap.php' ) ) {
+
+            $settings_link = '<a href="admin.php?page=wc-settings&tab=wwp_settings">' . __( 'Plugin Settings' , 'woocommerce-wholesale-prices' ) . '</a>';
+            array_unshift( $links , $settings_link );
+
+        }
+
+        return $links;
 
     }
 

@@ -67,6 +67,11 @@ https://wholesalesuiteplugin.com/product/woocommerce-wholesale-prices-premium/
 
 == Changelog ==
 
+= 1.0.1 =
+* Feature: Added wholesale price columns to Product listing page on backend
+* Feature: Added preview of settings available in Premium
+* Feature: Added link to settings page from installed plugins screen
+
 = 1.0.0 =
 * Initial version
 
