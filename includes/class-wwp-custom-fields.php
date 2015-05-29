@@ -147,15 +147,18 @@ class WWP_Custom_Fields {
                         }
 
                         ?>
+
                         <div id="<?php echo $roleKey; ?>_wholesale_price" class="wholesale_price">
                         <?php
                         // Print the wholesale price
-                        echo $wholesalePrice;
+                        if ( empty( $wholesalePrice ) )
+                            echo $wholesalePrice;
+                        else
+                            echo '<div class="wholesale_role">' . $role[ 'roleName' ] . '</div>' . $wholesalePrice;
                         ?>
                         </div>
-                    <?php
-                    }
-                    ?>
+
+                <?php } ?>
                 </div>
                 <?php
 
@@ -289,20 +292,25 @@ class WWP_Custom_Fields {
      */
     public function saveSimpleProductCustomFields($post_id,$registeredCustomRoles){
 
-        foreach($registeredCustomRoles as $roleKey => $role){
+        foreach ( $registeredCustomRoles as $roleKey => $role ) {
 
-            $wholesalePrice = trim(esc_attr( $_POST[$roleKey.'_wholesale_price'] ));
+            $wholesalePrice = trim( esc_attr( $_POST[$roleKey.'_wholesale_price'] ) );
 
-            if(!empty($wholesalePrice)){
-                if(!is_numeric($wholesalePrice))
+            if( !empty( $wholesalePrice ) ){
+                if( !is_numeric( $wholesalePrice ) )
                     $wholesalePrice = '';
-                elseif($wholesalePrice < 0)
+                elseif( $wholesalePrice < 0 )
                     $wholesalePrice = 0;
                 else
                     $wholesalePrice = wc_format_decimal( $wholesalePrice );
             }
 
-            update_post_meta( $post_id, $roleKey.'_wholesale_price', wc_clean($wholesalePrice) );
+            update_post_meta( $post_id, $roleKey.'_wholesale_price', wc_clean( $wholesalePrice ) );
+
+            if ( is_numeric( $wholesalePrice ) && $wholesalePrice > 0 )
+                update_post_meta( $post_id , $roleKey . '_have_wholesale_price' , 'yes' );
+            else
+                update_post_meta( $post_id , $roleKey . '_have_wholesale_price' , 'no' );
 
         }
 
@@ -321,6 +329,12 @@ class WWP_Custom_Fields {
         global $_POST;
 
         if (isset( $_POST['variable_sku'] ) ){
+
+            // We delete this meta in the beggining coz we are using add_post_meta, not update_post_meta below
+            // If we dont delete this, the values will be stacked with the old values
+            // Note: per role
+            foreach($registeredCustomRoles as $roleKey => $role)
+                delete_post_meta( $_POST[ 'post_ID' ] , $roleKey . '_variations_with_wholesale_price' );
 
             $variable_sku = $_POST['variable_sku'];
             $variable_post_id = $_POST['variable_post_id'];
@@ -345,10 +359,32 @@ class WWP_Custom_Fields {
                         }
 
                         update_post_meta( $variation_id, $roleKey.'_wholesale_price', wc_clean( $wholesalePrices[$i] ) );
+
+                        // If it has a valid wholesale price, attach a meta to the parent product that specifies
+                        // what are the variation id of the variations that has valid wholesale price
+                        // Note: per role
+                        if ( is_numeric( $wholesalePrices[$i] ) && $wholesalePrices[$i] > 0 )
+                            add_post_meta( $_POST[ 'post_ID' ] , $roleKey . '_variations_with_wholesale_price' , $variation_id );
+
                     }
                 }
 
             }
+
+            // Universal meta to use to mark if a product ( variable or not ) has a valid wholesale price
+            // If product is variable, if even only one variation has a valid product price, the parent product is automatically
+            // marked as having a valid wholesale price.
+            foreach( $registeredCustomRoles as $roleKey => $role ) {
+
+                $postMeta = get_post_meta( $_POST[ 'post_ID' ] , $roleKey . '_variations_with_wholesale_price' );
+
+                if ( !empty( $postMeta ) )
+                    update_post_meta( $_POST[ 'post_ID' ] , $roleKey . '_have_wholesale_price' , 'yes' );
+                else
+                    update_post_meta( $_POST[ 'post_ID' ] , $roleKey . '_have_wholesale_price' , 'no' );
+
+            }
+
         }
 
     }

@@ -67,6 +67,10 @@ https://wholesalesuiteplugin.com/product/woocommerce-wholesale-prices-premium/
 
 == Changelog ==
 
+= 1.0.2 =
+* Bug Fix: Add some meta flags to be used within the loop to determine if products have wholesale prices defined
+* Bug Fix: Tidy up data displayed on the custom wholesale prices column on the product listing page on the backend
+
 = 1.0.1 =
 * Feature: Added wholesale price columns to Product listing page on backend
 * Feature: Added preview of settings available in Premium
