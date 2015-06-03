@@ -27,7 +27,7 @@ class WooCommerceWholeSalePrices {
     private $_wwp_custom_fields;
     private $_wwp_wholesale_prices;
 
-    const VERSION = '1.0.2';
+    const VERSION = '1.0.3';
 
 
 
