@@ -152,47 +152,69 @@ class WWP_Wholesale_Prices {
     }
 
     /**
-     * Filter to append wholesale price on variations of a variable product on single product page.
+     * Apply wholesale price whenever "get_html_price" function gets called inside a variation product.
+     * Variation product is the actual variation of a variable product.
+     * Variable product is the parent product which contains variations.
      *
-     * @param $available_variations
+     * @param $price
+     * @param $variation
      * @param $userWholesaleRole
-     *
      * @return mixed
-     * @since 1.0.0
+     *
+     * @since 1.0.3
      */
-    public function wholesaleVariationPriceHTMLFilter($available_variations,$userWholesaleRole){
+    public function wholesaleSingleVariationPriceHTMLFilter ( $price , $variation , $userWholesaleRole ) {
 
-        $variation = wc_get_product($available_variations['variation_id']);
+        if( !empty( $userWholesaleRole ) ) {
 
-        $wholesalePrice = trim($this->getUserProductWholesalePrice($variation->variation_id,$userWholesaleRole));
+            $currVarWholesalePrice = trim( $this->getUserProductWholesalePrice( $variation->variation_id , $userWholesaleRole ) );
+            $currVarWholesalePrice = apply_filters( 'wwp_filter_wholesale_price_shop' , $currVarWholesalePrice, $variation->variation_id, $userWholesaleRole );
 
-        $wholesalePrice = apply_filters( 'wwp_filter_wholesale_price_shop' , $wholesalePrice, $variation->variation_id, $userWholesaleRole );
+            $currVarPrice = $variation->price;
 
-        if(strcasecmp($wholesalePrice,'') != 0){
+            if($variation->is_on_sale())
+                $currVarPrice = $variation->get_sale_price();
 
-            $price_html = $available_variations['price_html'];
+            if(strcasecmp($currVarWholesalePrice,'') != 0)
+                $currVarPrice = $currVarWholesalePrice;
 
-            if (strpos($price_html,'ins') !== false){
-                $price_html = str_replace('ins','del',$price_html);
+            $wholesalePrice = '<span class="amount">' . wc_price( $currVarPrice ) . $variation->get_price_suffix() . '</span>';
+
+            if ( strcasecmp( $currVarWholesalePrice , '' ) != 0 ) {
+
+                // Crush out existing prices, regular and sale
+                if (strpos($price,'ins') !== false){
+                    $wholesalePriceHTML = str_replace('ins','del',$price);
+                }else{
+                    $wholesalePriceHTML = str_replace('<span','<del><span',$price);
+                    $wholesalePriceHTML = str_replace('</span>','</span></del>',$wholesalePriceHTML);
+                }
+
+                $wholesalePriceTitleText = 'Wholesale Price:';
+                $wholesalePriceTitleText = apply_filters('wwp_filter_wholesale_price_title_text',$wholesalePriceTitleText);
+
+                $wholesalePriceHTML .= '<div class="wholesale_price_container">
+                                            <span class="wholesale_price_title">'.$wholesalePriceTitleText.'</span>
+                                            <ins>' . $wholesalePrice . '</ins>
+                                        </div>';
+
+                return apply_filters( 'wwp_filter_wholesale_price_html', $wholesalePriceHTML, $price, $variation, $userWholesaleRole );
+
             }else{
-                $price_html = str_replace('<span class="amount">','<del><span class="amount">',$price_html);
-                $price_html = str_replace('</span></span>','</span></del></span>',$price_html);
+
+                // If wholesale price is empty (""), means that this product has no wholesale price set
+                // Just return the regular price
+                return $price;
+
             }
 
-            $wholesalePriceTitleText = 'Wholesale Price:';
-            $wholesalePriceTitleText = apply_filters('wwp_filter_wholesale_price_title_text',$wholesalePriceTitleText);
+        } else {
 
-            $price_html .=  '<div class="wholesale_price_container">';
-            $price_html .=      '<span class="wholesale_price_title">'.$wholesalePriceTitleText.'</span>';
-            $price_html .=      '<span class="price"><span class="amount">'.wc_price($wholesalePrice) . $variation->get_price_suffix().'</span></span>';
-            $price_html .=  '</div>';
+            // If $userWholeSaleRole is an empty array, meaning current user is not a wholesale customer,
+            // just return original $price html
+            return $price;
 
-            $price_html =  apply_filters( 'wwp_filter_variation_wholesale_price_html', $price_html, $available_variations, $userWholesaleRole );
-
-            $available_variations['price_html'] = $price_html;
         }
-
-        return $available_variations;
 
     }
 

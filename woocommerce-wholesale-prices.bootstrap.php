@@ -85,13 +85,16 @@ if ( in_array( 'woocommerce/woocommerce.php', apply_filters( 'active_plugins', g
 
 
 
+
     // Code for integrating into woocommerce price =====================================================================
 
     // Filter callback to embed the wholesale price to archive and single product pages
     add_filter( 'woocommerce_get_price_html' , array( $wc_wholesale_prices , 'wholesalePriceHTMLFilter' ) , 10 , 2 );
 
-    // Filter callback to embed the wholesale price to single product pages for variations of a variable product
-    add_action( 'woocommerce_available_variation' , array( $wc_wholesale_prices , 'wholesaleVariationPriceHTMLFilter' ) );
+    // Apply wholesale price whenever "get_html_price" function gets called inside a variation product
+    // Variation product is the actual variation of a variable product
+    // Variable product is the parent product which contains variations
+    add_action( 'woocommerce_get_variation_price_html' , array( $wc_wholesale_prices , 'wholesaleSingleVariationPriceHTMLFilter' ) , 10 , 2 );
 
     // Apply wholesale price upon adding product to cart
     add_action( 'woocommerce_before_calculate_totals' , array( $wc_wholesale_prices , 'applyProductWholesalePrice' ) , 10 , 1 );

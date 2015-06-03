@@ -569,16 +569,19 @@ class WooCommerceWholeSalePrices {
     }
 
     /**
-     * Filter to append wholesale price on variations of a variable product on single product page.
+     * Apply wholesale price whenever "get_html_price" function gets called inside a variation product.
+     * Variation product is the actual variation of a variable product.
+     * Variable product is the parent product which contains variations.
      *
-     * @param $available_variations
-     *
+     * @param $price
+     * @param $variation
      * @return mixed
-     * @since 1.0.0
+     *
+     * @since 1.0.3
      */
-    public function wholesaleVariationPriceHTMLFilter($available_variations){
+    public function wholesaleSingleVariationPriceHTMLFilter ( $price , $variation ) {
 
-        return $this->_wwp_wholesale_prices->wholesaleVariationPriceHTMLFilter($available_variations,$this->_wwp_wholesale_roles->getUserWholesaleRole());
+        return $this->_wwp_wholesale_prices->wholesaleSingleVariationPriceHTMLFilter( $price , $variation , $this->_wwp_wholesale_roles->getUserWholesaleRole() );
 
     }
 
