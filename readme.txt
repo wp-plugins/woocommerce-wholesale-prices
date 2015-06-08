@@ -67,6 +67,9 @@ https://wholesalesuiteplugin.com/product/woocommerce-wholesale-prices-premium/
 
 == Changelog ==
 
+= 1.0.4 =
+* Bug Fix: Add additional meta flags to be used within the loop to determine if products have wholesale prices defined
+
 = 1.0.3 =
 * Bug Fix: Refactor logic of applying wholesale price to variable product variation
 

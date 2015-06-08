@@ -27,7 +27,7 @@ class WooCommerceWholeSalePrices {
     private $_wwp_custom_fields;
     private $_wwp_wholesale_prices;
 
-    const VERSION = '1.0.3';
+    const VERSION = '1.0.4';
 
 
 
@@ -80,7 +80,7 @@ class WooCommerceWholeSalePrices {
      *
      * @since 1.0.0
      */
-    public function init(){
+    public function init() {
 
         // Add plugin custom roles and capabilities
         $this->_wwp_wholesale_roles->addCustomRole('wholesale_customer','Wholesale Customer');
@@ -150,8 +150,34 @@ class WooCommerceWholeSalePrices {
 
                     if ( !empty( $postMeta ) )
                         update_post_meta( $product->id , $roleKey . '_have_wholesale_price' , 'yes' );
-                    else
+                    else {
+
                         update_post_meta( $product->id , $roleKey . '_have_wholesale_price' , 'no' );
+
+                        $terms = get_the_terms( $product->id , 'product_cat' );
+                        if ( !is_array( $terms ) )
+                            $terms = array();
+
+                        foreach ( $terms as $term ) {
+
+                            $category_wholesale_prices = get_option( 'taxonomy_' . $term->term_id );
+
+                            if ( is_array( $category_wholesale_prices ) && array_key_exists( $roleKey . '_wholesale_discount' , $category_wholesale_prices ) ) {
+
+                                $curr_discount = $category_wholesale_prices[ $roleKey . '_wholesale_discount' ];
+
+                                if ( !empty( $curr_discount ) ) {
+
+                                    update_post_meta( $product->id , $roleKey . '_have_wholesale_price' , 'yes' );
+                                    break;
+
+                                }
+
+                            }
+
+                        }
+
+                    }
 
                 }
 
@@ -164,8 +190,34 @@ class WooCommerceWholeSalePrices {
 
                     if ( is_numeric( $wholesalePrice ) && $wholesalePrice > 0 )
                         update_post_meta( $product->id , $roleKey . '_have_wholesale_price' , 'yes' );
-                    else
+                    else {
+
                         update_post_meta( $product->id , $roleKey . '_have_wholesale_price' , 'no' );
+
+                        $terms = get_the_terms( $product->id , 'product_cat' );
+                        if ( !is_array( $terms ) )
+                            $terms = array();
+
+                        foreach ( $terms as $term ) {
+
+                            $category_wholesale_prices = get_option( 'taxonomy_' . $term->term_id );
+
+                            if ( is_array( $category_wholesale_prices ) && array_key_exists( $roleKey . '_wholesale_discount' , $category_wholesale_prices ) ) {
+
+                                $curr_discount = $category_wholesale_prices[ $roleKey . '_wholesale_discount' ];
+
+                                if ( !empty( $curr_discount ) ) {
+
+                                    update_post_meta( $product->id , $roleKey . '_have_wholesale_price' , 'yes' );
+                                    break;
+
+                                }
+
+                            }
+
+                        }
+
+                    }
 
                 }
 

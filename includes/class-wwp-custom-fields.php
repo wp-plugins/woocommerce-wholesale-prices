@@ -283,34 +283,63 @@ class WWP_Custom_Fields {
     }
 
     /**
-     * Save wholesale custom price field on single products.
+     * Save wholesale custom price field on simple products.
      *
      * @param $post_id
      * @param $registeredCustomRoles
      *
      * @since 1.0.0
      */
-    public function saveSimpleProductCustomFields($post_id,$registeredCustomRoles){
+    public function saveSimpleProductCustomFields ( $post_id , $registeredCustomRoles ) {
 
         foreach ( $registeredCustomRoles as $roleKey => $role ) {
 
-            $wholesalePrice = trim( esc_attr( $_POST[$roleKey.'_wholesale_price'] ) );
+            $wholesalePrice = trim( esc_attr( $_POST[ $roleKey . '_wholesale_price' ] ) );
 
-            if( !empty( $wholesalePrice ) ){
+            if ( !empty( $wholesalePrice ) ) {
+
                 if( !is_numeric( $wholesalePrice ) )
                     $wholesalePrice = '';
-                elseif( $wholesalePrice < 0 )
+                elseif ( $wholesalePrice < 0 )
                     $wholesalePrice = 0;
                 else
                     $wholesalePrice = wc_format_decimal( $wholesalePrice );
+
+                if ( is_numeric( $wholesalePrice ) && $wholesalePrice > 0 )
+                    update_post_meta( $post_id , $roleKey . '_have_wholesale_price' , 'yes' );
+                else
+                    update_post_meta( $post_id , $roleKey . '_have_wholesale_price' , 'no' );
+
+            } else {
+
+                update_post_meta( $post_id , $roleKey . '_have_wholesale_price' , 'no' );
+
+                $terms = get_the_terms( $post_id , 'product_cat' );
+                if ( !is_array( $terms ) )
+                    $terms = array();
+
+                foreach ( $terms as $term ) {
+
+                    $category_wholesale_prices = get_option( 'taxonomy_' . $term->term_id );
+
+                    if ( is_array( $category_wholesale_prices ) && array_key_exists( $roleKey . '_wholesale_discount' , $category_wholesale_prices ) ) {
+
+                        $curr_discount = $category_wholesale_prices[ $roleKey . '_wholesale_discount' ];
+
+                        if ( !empty( $curr_discount ) ) {
+
+                            update_post_meta( $post_id , $roleKey . '_have_wholesale_price' , 'yes' );
+                            break;
+
+                        }
+
+                    }
+
+                }
+
             }
 
             update_post_meta( $post_id, $roleKey.'_wholesale_price', wc_clean( $wholesalePrice ) );
-
-            if ( is_numeric( $wholesalePrice ) && $wholesalePrice > 0 )
-                update_post_meta( $post_id , $roleKey . '_have_wholesale_price' , 'yes' );
-            else
-                update_post_meta( $post_id , $roleKey . '_have_wholesale_price' , 'no' );
 
         }
 
@@ -380,8 +409,34 @@ class WWP_Custom_Fields {
 
                 if ( !empty( $postMeta ) )
                     update_post_meta( $_POST[ 'post_ID' ] , $roleKey . '_have_wholesale_price' , 'yes' );
-                else
+                else {
+
                     update_post_meta( $_POST[ 'post_ID' ] , $roleKey . '_have_wholesale_price' , 'no' );
+
+                    $terms = get_the_terms( $_POST[ 'post_ID' ] , 'product_cat' );
+                    if ( !is_array( $terms ) )
+                        $terms = array();
+
+                    foreach ( $terms as $term ) {
+
+                        $category_wholesale_prices = get_option( 'taxonomy_' . $term->term_id );
+
+                        if ( is_array( $category_wholesale_prices ) && array_key_exists( $roleKey . '_wholesale_discount' , $category_wholesale_prices ) ) {
+
+                            $curr_discount = $category_wholesale_prices[ $roleKey . '_wholesale_discount' ];
+
+                            if ( !empty( $curr_discount ) ) {
+
+                                update_post_meta( $_POST[ 'post_ID' ] , $roleKey . '_have_wholesale_price' , 'yes' );
+                                break;
+
+                            }
+
+                        }
+
+                    }
+
+                }
 
             }
 
