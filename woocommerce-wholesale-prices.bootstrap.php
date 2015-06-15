@@ -4,7 +4,7 @@ Plugin Name:    Woocommerce Wholesale Prices
 Plugin URI:     https://wholesalesuiteplugin.com
 Description:    WooCommerce Extension to Provide Wholesale Prices Functionality
 Author:         Rymera Web Co
-Version:        1.0.4
+Version:        1.0.5
 Author URI:     http://rymera.com.au/
 Text Domain:    woocommerce-wholesale-prices
 */

@@ -67,6 +67,11 @@ https://wholesalesuiteplugin.com/product/woocommerce-wholesale-prices-premium/
 
 == Changelog ==
 
+//European style prices with comma instead of decimal points cannot be saved in our fields
+
+= 1.0.5 =
+* Bug Fix: Allow saving of European style prices ( comma used as decimal separator )
+
 = 1.0.4 =
 * Bug Fix: Add additional meta flags to be used within the loop to determine if products have wholesale prices defined
 

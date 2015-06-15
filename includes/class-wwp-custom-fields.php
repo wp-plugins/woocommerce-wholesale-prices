@@ -130,12 +130,10 @@ class WWP_Custom_Fields {
 
                                 if ($someVariationsHaveWholesalePrice && strcasecmp($minPrice,'') != 0 && strcasecmp($maxPrice,'') != 0){
 
-                                    if ($minPrice != $maxPrice && $minPrice < $maxPrice){
-                                        $wholesalePrice = wc_price($minPrice) . ' - ';
-                                        $wholesalePrice .= wc_price($maxPrice);
-                                    } else {
-                                        $wholesalePrice = wc_price($maxPrice);
-                                    }
+                                    if ( $minPrice != $maxPrice && $minPrice < $maxPrice )
+                                        $wholesalePrice = wc_price( wc_format_localized_price( $minPrice ) ) . ' - ' . wc_price( wc_format_localized_price( $maxPrice ) );
+                                    else
+                                        $wholesalePrice = wc_price( wc_format_localized_price( $maxPrice ) );
 
                                 }
 
@@ -143,7 +141,7 @@ class WWP_Custom_Fields {
                                 continue;
                             }
                         } else {
-                            $wholesalePrice = wc_price($wholesalePrice);
+                            $wholesalePrice = wc_price( wc_format_localized_price( $wholesalePrice ) );
                         }
 
                         ?>
@@ -296,6 +294,15 @@ class WWP_Custom_Fields {
 
             $wholesalePrice = trim( esc_attr( $_POST[ $roleKey . '_wholesale_price' ] ) );
 
+            $thousand_sep = get_option( 'woocommerce_price_thousand_sep' );
+            $decimal_sep = get_option( 'woocommerce_price_decimal_sep' );
+
+            if ( $thousand_sep )
+                $wholesalePrice = str_replace( $thousand_sep , '' , $wholesalePrice );
+
+            if ( $decimal_sep )
+                $wholesalePrice = str_replace( $decimal_sep , '.' , $wholesalePrice );
+
             if ( !empty( $wholesalePrice ) ) {
 
                 if( !is_numeric( $wholesalePrice ) )
@@ -368,6 +375,9 @@ class WWP_Custom_Fields {
             $variable_sku = $_POST['variable_sku'];
             $variable_post_id = $_POST['variable_post_id'];
 
+            $thousand_sep = get_option( 'woocommerce_price_thousand_sep' );
+            $decimal_sep = get_option( 'woocommerce_price_decimal_sep' );
+
             foreach($registeredCustomRoles as $roleKey => $role){
 
                 $wholesalePrices = $_POST[$roleKey.'_wholesale_prices'];
@@ -377,6 +387,12 @@ class WWP_Custom_Fields {
                     if ( isset( $wholesalePrices[$i] ) ) {
 
                         $wholesalePrices[$i] = trim(esc_attr( $wholesalePrices[$i] ));
+
+                        if ( $thousand_sep )
+                            $wholesalePrices[$i] = str_replace( $thousand_sep , '' ,  $wholesalePrices[$i] );
+
+                        if ( $decimal_sep )
+                            $wholesalePrices[$i] = str_replace( $decimal_sep , '.' ,  $wholesalePrices[$i] );
 
                         if(!empty($wholesalePrices[$i])){
                             if(!is_numeric($wholesalePrices[$i]))
@@ -457,20 +473,18 @@ class WWP_Custom_Fields {
             <h4><?php _e( 'Wholesale Price', 'woocommerce' ); ?></h4>
 
             <?php
-            foreach($registeredCustomRoles as $roleKey => $role){
+            foreach ( $registeredCustomRoles as $roleKey => $role ) {
 
                 $currencySymbol = get_woocommerce_currency_symbol();
                 if(array_key_exists('currency_symbol',$role) && !empty($role['currency_symbol']))
-                    $currencySymbol = $role['currency_symbol'];
+                    $currencySymbol = $role['currency_symbol']; ?>
 
-                ?>
                 <label class="alignleft" style="width: 100%;">
                     <div class="title"><?php _e( $role['roleName'].' Price ('.$currencySymbol.')', 'woocommerce-wholesale-prices' ); ?></div>
                     <input type="text" name="<?php echo $roleKey; ?>_wholesale_price" class="text wholesale_price wc_input_price" value="">
                 </label>
-            <?php
-            }
-            ?>
+
+            <?php } ?>
             <div style="clear: both; float: none; display: block;"></div>
         </div>
     <?php
@@ -496,6 +510,15 @@ class WWP_Custom_Fields {
                 if ( isset( $_REQUEST[$roleKey.'_wholesale_price'] ) ) {
 
                     $wholesalePrice = trim(esc_attr( $_REQUEST[$roleKey.'_wholesale_price'] ));
+
+                    $thousand_sep = get_option( 'woocommerce_price_thousand_sep' );
+                    $decimal_sep = get_option( 'woocommerce_price_decimal_sep' );
+
+                    if ( $thousand_sep )
+                        $wholesalePrice = str_replace( $thousand_sep , '' , $wholesalePrice );
+
+                    if ( $decimal_sep )
+                        $wholesalePrice = str_replace( $decimal_sep , '.' , $wholesalePrice );
 
                     if(!empty($wholesalePrice)){
                         if(!is_numeric($wholesalePrice))
@@ -524,22 +547,18 @@ class WWP_Custom_Fields {
      *
      * @since 1.0.0
      */
-    public function addCustomWholesaleFieldsMetaDataOnProductListingColumn($column,$post_id,$registeredCustomRoles){
+    public function addCustomWholesaleFieldsMetaDataOnProductListingColumn( $column , $post_id , $registeredCustomRoles ) {
 
         switch ( $column ) {
-            case 'name' :
-                ?>
-                <div class="hidden wholesale_prices_inline" id="wholesale_prices_inline_<?php echo $post_id; ?>">
-                    <?php
-                    foreach($registeredCustomRoles as $roleKey => $role){
-                        ?>
-                        <div id="<?php echo $roleKey; ?>_wholesale_price" class="whole_price"><?php echo get_post_meta($post_id,$roleKey.'_wholesale_price',true); ?></div>
-                    <?php
-                    }
-                    ?>
-                </div>
-                <?php
+            case 'name' : ?>
 
+                <div class="hidden wholesale_prices_inline" id="wholesale_prices_inline_<?php echo $post_id; ?>">
+                    <?php foreach ( $registeredCustomRoles as $roleKey => $role ) { ?>
+                        <div id="<?php echo $roleKey; ?>_wholesale_price" class="whole_price"><?php echo wc_format_localized_price( get_post_meta( $post_id , $roleKey . '_wholesale_price' , true ) ); ?></div>
+                    <?php } ?>
+                </div>
+
+                <?php
                 break;
 
             default :
