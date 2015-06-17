@@ -346,7 +346,8 @@ class WWP_Custom_Fields {
 
             }
 
-            update_post_meta( $post_id, $roleKey.'_wholesale_price', wc_clean( $wholesalePrice ) );
+            $wholesalePrice = wc_clean( apply_filters( 'wwp_filter_before_save_wholesale_price' , $wholesalePrice , $roleKey , $post_id , 'simple' ) );
+            update_post_meta( $post_id, $roleKey.'_wholesale_price', $wholesalePrice );
 
         }
 
@@ -403,7 +404,8 @@ class WWP_Custom_Fields {
                                 $wholesalePrices[$i] = wc_format_decimal($wholesalePrices[$i]);
                         }
 
-                        update_post_meta( $variation_id, $roleKey.'_wholesale_price', wc_clean( $wholesalePrices[$i] ) );
+                        $wholesalePrices[ $i ] = wc_clean( apply_filters( 'wwp_filter_before_save_wholesale_price' , $wholesalePrices[ $i ] , $roleKey , $variation_id , 'variation' ) );
+                        update_post_meta( $variation_id, $roleKey.'_wholesale_price', $wholesalePrices[ $i ] );
 
                         // If it has a valid wholesale price, attach a meta to the parent product that specifies
                         // what are the variation id of the variations that has valid wholesale price
@@ -499,13 +501,13 @@ class WWP_Custom_Fields {
      *
      * @since 1.0.0
      */
-    public function saveCustomWholesaleFieldsOnQuickEditScreen($product, $registeredCustomRoles){
+    public function saveCustomWholesaleFieldsOnQuickEditScreen( $product , $registeredCustomRoles ) {
 
-        if ( $product->is_type('simple') || $product->is_type('external') ) {
+        if ( $product->is_type( 'simple' ) || $product->is_type( 'external' ) ) {
 
             $post_id = $product->id;
 
-            foreach($registeredCustomRoles as $roleKey => $role){
+            foreach ( $registeredCustomRoles as $roleKey => $role ) {
 
                 if ( isset( $_REQUEST[$roleKey.'_wholesale_price'] ) ) {
 
@@ -520,16 +522,52 @@ class WWP_Custom_Fields {
                     if ( $decimal_sep )
                         $wholesalePrice = str_replace( $decimal_sep , '.' , $wholesalePrice );
 
-                    if(!empty($wholesalePrice)){
-                        if(!is_numeric($wholesalePrice))
+                    if ( !empty( $wholesalePrice ) ) {
+
+                        if( !is_numeric( $wholesalePrice ) )
                             $wholesalePrice = '';
-                        elseif($wholesalePrice < 0)
+                        elseif( $wholesalePrice < 0 )
                             $wholesalePrice = 0;
                         else
                             $wholesalePrice = wc_format_decimal( $wholesalePrice );
+
+                        if ( is_numeric( $wholesalePrice ) && $wholesalePrice > 0 )
+                            update_post_meta( $post_id , $roleKey . '_have_wholesale_price' , 'yes' );
+                        else
+                            update_post_meta( $post_id , $roleKey . '_have_wholesale_price' , 'no' );
+
+                    } else {
+
+                        update_post_meta( $post_id , $roleKey . '_have_wholesale_price' , 'no' );
+
+                        $terms = get_the_terms( $post_id , 'product_cat' );
+                        if ( !is_array( $terms ) )
+                            $terms = array();
+
+                        foreach ( $terms as $term ) {
+
+                            $category_wholesale_prices = get_option( 'taxonomy_' . $term->term_id );
+
+                            if ( is_array( $category_wholesale_prices ) && array_key_exists( $roleKey . '_wholesale_discount' , $category_wholesale_prices ) ) {
+
+                                $curr_discount = $category_wholesale_prices[ $roleKey . '_wholesale_discount' ];
+
+                                if ( !empty( $curr_discount ) ) {
+
+                                    update_post_meta( $post_id , $roleKey . '_have_wholesale_price' , 'yes' );
+                                    break;
+
+                                }
+
+                            }
+
+                        }
+
                     }
 
-                    update_post_meta( $post_id, $roleKey.'_wholesale_price', wc_clean( $wholesalePrice ) );
+                    $wholesalePrice = wc_clean( apply_filters( 'wwp_filter_before_save_wholesale_price' , $wholesalePrice , $roleKey , $post_id , 'simple' ) );
+                    update_post_meta( $post_id , $roleKey . '_wholesale_price' , $wholesalePrice );
+
                 }
             }
         }

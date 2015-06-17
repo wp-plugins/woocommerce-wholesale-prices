@@ -4,7 +4,7 @@ Plugin Name:    Woocommerce Wholesale Prices
 Plugin URI:     https://wholesalesuiteplugin.com
 Description:    WooCommerce Extension to Provide Wholesale Prices Functionality
 Author:         Rymera Web Co
-Version:        1.0.5
+Version:        1.0.6
 Author URI:     http://rymera.com.au/
 Text Domain:    woocommerce-wholesale-prices
 */
@@ -88,7 +88,7 @@ if ( in_array( 'woocommerce/woocommerce.php', apply_filters( 'active_plugins', g
 
     // Code for integrating into woocommerce price =====================================================================
 
-    // Filter callback to embed the wholesale price to archive and single product pages
+    // Apply wholesale price to archive and single product pages
     add_filter( 'woocommerce_get_price_html' , array( $wc_wholesale_prices , 'wholesalePriceHTMLFilter' ) , 10 , 2 );
 
     // Apply wholesale price whenever "get_html_price" function gets called inside a variation product
@@ -100,7 +100,7 @@ if ( in_array( 'woocommerce/woocommerce.php', apply_filters( 'active_plugins', g
     add_action( 'woocommerce_before_calculate_totals' , array( $wc_wholesale_prices , 'applyProductWholesalePrice' ) , 10 , 1 );
 
     // Apply wholesale price on WC Cart Widget.
-    add_filter( 'woocommerce_cart_item_price' , array( $wc_wholesale_prices , 'applyProductWholesalePriceOnDefaultWCCartWidget' ) , 10, 3 );
+    add_filter( 'woocommerce_cart_item_price' , array( $wc_wholesale_prices , 'applyProductWholesalePriceOnDefaultWCCartWidget' ) , 10 , 3 );
 
     // Add notice to WC Widget if the user (wholesale user) fails to avail the wholesale price requirements. Only applies to wholesale users.
     add_action( 'woocommerce_before_mini_cart' , array( $wc_wholesale_prices , 'beforeWCWidget' ) );

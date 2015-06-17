@@ -63,7 +63,7 @@ class WWP_Wholesale_Prices {
                 if(strcasecmp($wholesalePrice,'') != 0)
                     $wholesalePrice = '<span class="amount">'.wc_price($wholesalePrice) . $product->get_price_suffix().'</span>';
 
-            } elseif ($product->product_type == 'variable'){
+            } elseif ($product->product_type == 'variable') {
 
                 $variations = $product->get_available_variations();
                 $minPrice = '';
@@ -131,7 +131,7 @@ class WWP_Wholesale_Prices {
                                             <ins>' . $wholesalePrice . '</ins>
                                         </div>';
 
-                return apply_filters( 'wwp_filter_wholesale_price_html', $wholesalePriceHTML, $price, $product, $userWholesaleRole );
+                return apply_filters( 'wwp_filter_wholesale_price_html' , $wholesalePriceHTML , $price , $product , $userWholesaleRole );
 
             }else{
 
@@ -230,30 +230,30 @@ class WWP_Wholesale_Prices {
 
         $apply_wholesale_price = $this->checkIfApplyWholesalePrice( $cart_object , $userWholesaleRole );
 
-        do_action('wwp_action_before_apply_wholesale_price_cart_loop', $apply_wholesale_price, $cart_object, $userWholesaleRole);
+        do_action( 'wwp_action_before_apply_wholesale_price_cart_loop' , $apply_wholesale_price , $cart_object , $userWholesaleRole );
 
         if ( !empty( $userWholesaleRole ) && $apply_wholesale_price === true ) {
 
             foreach ( $cart_object->cart_contents as $cart_item_key => $value ) {
 
                 $wholesalePrice = '';
-                if($value['data']->product_type == 'simple'){
+                if ( $value['data']->product_type == 'simple' ) {
 
-                    $wholesalePrice = trim($this->getUserProductWholesalePrice($value['data']->id,$userWholesaleRole));
-                    $wholesalePrice = apply_filters( 'wwp_filter_wholesale_price_cart' , $wholesalePrice, $value['data']->id, $userWholesaleRole );
+                    $wholesalePrice = trim( $this->getUserProductWholesalePrice( $value['data']->id , $userWholesaleRole ) );
+                    $wholesalePrice = apply_filters( 'wwp_filter_wholesale_price_cart' , $wholesalePrice , $value[ 'data' ]->id , $userWholesaleRole , $value );
 
-                } elseif ($value['data']->product_type == 'variation'){
+                } elseif ( $value['data']->product_type == 'variation' ) {
 
-                    $wholesalePrice = trim($this->getUserProductWholesalePrice($value['data']->variation_id,$userWholesaleRole));
-                    $wholesalePrice = apply_filters( 'wwp_filter_wholesale_price_cart' , $wholesalePrice, $value['data']->variation_id, $userWholesaleRole );
+                    $wholesalePrice = trim( $this->getUserProductWholesalePrice( $value['data']->variation_id , $userWholesaleRole ) );
+                    $wholesalePrice = apply_filters( 'wwp_filter_wholesale_price_cart' , $wholesalePrice , $value[ 'data' ]->variation_id , $userWholesaleRole , $value );
 
                 }
 
-                if(strcasecmp($wholesalePrice,'') != 0){
+                if( strcasecmp ( $wholesalePrice , '' ) != 0 ) {
 
-                    do_action('wwp_action_before_apply_wholesale_price',$wholesalePrice);
-
+                    do_action( 'wwp_action_before_apply_wholesale_price' , $wholesalePrice );
                     $value['data']->price = $wholesalePrice;
+
                 }
 
             }
@@ -266,7 +266,7 @@ class WWP_Wholesale_Prices {
 
                     // Print notice why a wholesale user is not qualified for a wholesale price
                     // Only print on cart page ( Have some side effects when printed on checkout page )
-                    wc_print_notice( $apply_wholesale_price['message'] , $apply_wholesale_price['type'] );
+                    wc_print_notice( $apply_wholesale_price['message'] , $apply_wholesale_price[ 'type' ] );
 
                 }
 
@@ -301,9 +301,20 @@ class WWP_Wholesale_Prices {
         if ( $applyWholesalePrice !== true && !empty( $userWholesaleRole ) ) {
 
             if ( is_array( $applyWholesalePrice ) && array_key_exists( 'message' , $applyWholesalePrice ) && array_key_exists( 'type' , $applyWholesalePrice ) ) {
+                // Pre Version 1.2.0 of wwpp where it sends back single dimension array of notice
 
                 // Print notice why a wholesale user is not qualified for a wholesale price
-                wc_print_notice( $applyWholesalePrice['message'] , $applyWholesalePrice['type'] );
+                wc_print_notice( $applyWholesalePrice[ 'message' ] , $applyWholesalePrice[ 'type' ] );
+
+            } elseif ( is_array( $applyWholesalePrice ) ) {
+                // Version 1.2.0 of wwpp where it sends back multiple notice via multi dimensional arrays
+
+                foreach ( $applyWholesalePrice as $notice ) {
+
+                    if ( array_key_exists( 'message' , $notice ) && array_key_exists( 'type' , $notice ) )
+                        wc_print_notice( $notice[ 'message' ] , $notice[ 'type' ] );
+
+                }
 
             }
 
@@ -324,19 +335,23 @@ class WWP_Wholesale_Prices {
      */
     public function applyProductWholesalePriceOnDefaultWCCartWidget ( $product_price , $cart_item , $cart_item_key ,  $userWholesaleRole ) {
 
-        if ( $this->checkIfApplyWholesalePrice( WC()->cart , $userWholesaleRole ) === true ) {
+        $apply_wholesale_price = $this->checkIfApplyWholesalePrice( WC()->cart , $userWholesaleRole );
+
+        do_action( 'wwp_action_before_apply_wholesale_price_cart_loop' , $apply_wholesale_price , WC()->cart , $userWholesaleRole );
+
+        if ( !empty( $userWholesaleRole ) && $apply_wholesale_price === true ) {
 
             $wholesalePrice = '';
 
             if ( $cart_item[ 'data' ]->product_type == 'simple' ) {
 
                 $wholesalePrice = trim( $this->getUserProductWholesalePrice( $cart_item[ 'data' ]->id , $userWholesaleRole ) );
-                $wholesalePrice = apply_filters( 'wwp_filter_wholesale_price_cart' , $wholesalePrice , $cart_item[ 'data' ]->id , $userWholesaleRole );
+                $wholesalePrice = apply_filters( 'wwp_filter_wholesale_price_cart' , $wholesalePrice , $cart_item[ 'data' ]->id , $userWholesaleRole , $cart_item );
 
             } elseif ( $cart_item['data']->product_type == 'variation' ) {
 
                 $wholesalePrice = trim( $this->getUserProductWholesalePrice( $cart_item[ 'data' ]->variation_id , $userWholesaleRole ) );
-                $wholesalePrice = apply_filters( 'wwp_filter_wholesale_price_cart' , $wholesalePrice , $cart_item[ 'data' ]->variation_id , $userWholesaleRole );
+                $wholesalePrice = apply_filters( 'wwp_filter_wholesale_price_cart' , $wholesalePrice , $cart_item[ 'data' ]->variation_id , $userWholesaleRole , $cart_item );
 
             }
 
