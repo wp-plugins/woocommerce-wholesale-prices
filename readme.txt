@@ -69,6 +69,9 @@ https://wholesalesuiteplugin.com/product/woocommerce-wholesale-prices-premium/
 
 //European style prices with comma instead of decimal points cannot be saved in our fields
 
+= 1.0.7 =
+* Bug Fix: Refactor logic on implementation of minimum price requirements
+
 = 1.0.6 =
 * Bug Fix: Properly mark wholesale products if wholesale price is set
 * Minor Feature: Add additional filter and action hooks
