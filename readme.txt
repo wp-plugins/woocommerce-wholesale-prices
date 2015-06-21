@@ -67,8 +67,6 @@ https://wholesalesuiteplugin.com/product/woocommerce-wholesale-prices-premium/
 
 == Changelog ==
 
-//European style prices with comma instead of decimal points cannot be saved in our fields
-
 = 1.0.7 =
 * Bug Fix: Refactor logic on implementation of minimum price requirements
 
