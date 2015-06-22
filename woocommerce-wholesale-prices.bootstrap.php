@@ -4,7 +4,7 @@ Plugin Name:    Woocommerce Wholesale Prices
 Plugin URI:     https://wholesalesuiteplugin.com
 Description:    WooCommerce Extension to Provide Wholesale Prices Functionality
 Author:         Rymera Web Co
-Version:        1.0.7
+Version:        1.0.8
 Author URI:     http://rymera.com.au/
 Text Domain:    woocommerce-wholesale-prices
 */
@@ -77,6 +77,9 @@ if ( in_array( 'woocommerce/woocommerce.php', apply_filters( 'active_plugins', g
     // The purpose for this is to set the wholesale custom "FORM" fields the value of the existing wholesale custom fields value
     // This is utilized by the wwp-quick-edit.js file
     add_action( 'manage_product_posts_custom_column', array($wc_wholesale_prices,'addCustomWholesaleFieldsMetaDataOnProductListingColumn'),99,2);
+
+
+
 
     // Code for adding wholesale column to product listing screen ======================================================
 

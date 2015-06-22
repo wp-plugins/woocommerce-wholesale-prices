@@ -131,20 +131,17 @@ class WWP_Custom_Fields {
                                 if ($someVariationsHaveWholesalePrice && strcasecmp($minPrice,'') != 0 && strcasecmp($maxPrice,'') != 0){
 
                                     if ( $minPrice != $maxPrice && $minPrice < $maxPrice )
-                                        $wholesalePrice = wc_price( wc_format_localized_price( $minPrice ) ) . ' - ' . wc_price( wc_format_localized_price( $maxPrice ) );
+                                        $wholesalePrice = wc_price( $minPrice ) . ' - ' . wc_price( $maxPrice );
                                     else
-                                        $wholesalePrice = wc_price( wc_format_localized_price( $maxPrice ) );
+                                        $wholesalePrice = wc_price( $maxPrice );
 
                                 }
 
-                            } else {
+                            } else
                                 continue;
-                            }
-                        } else {
-                            $wholesalePrice = wc_price( wc_format_localized_price( $wholesalePrice ) );
-                        }
 
-                        ?>
+                        } else
+                            $wholesalePrice = wc_price( $wholesalePrice ); ?>
 
                         <div id="<?php echo $roleKey; ?>_wholesale_price" class="wholesale_price">
                         <?php

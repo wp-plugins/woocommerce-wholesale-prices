@@ -67,6 +67,9 @@ https://wholesalesuiteplugin.com/product/woocommerce-wholesale-prices-premium/
 
 == Changelog ==
 
+= 1.0.8 =
+* Bug Fix: Improve European style prices support
+
 = 1.0.7 =
 * Bug Fix: Refactor logic on implementation of minimum price requirements
 
