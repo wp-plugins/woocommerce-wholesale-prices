@@ -50,81 +50,80 @@ class WWP_Wholesale_Prices {
      */
     public function wholesalePriceHTMLFilter($price, $product, $userWholesaleRole){
 
-        if(!empty($userWholesaleRole)){
+        if ( !empty( $userWholesaleRole ) ) {
 
             $wholesalePrice = '';
 
-            if ($product->product_type == 'simple') {
+            if ( $product->product_type == 'simple' ) {
 
-                $wholesalePrice = trim($this->getUserProductWholesalePrice($product->id,$userWholesaleRole));
+                $wholesalePrice = trim( $this->getUserProductWholesalePrice( $product->id , $userWholesaleRole ) );
 
-                $wholesalePrice = apply_filters( 'wwp_filter_wholesale_price_shop' , $wholesalePrice, $product->id, $userWholesaleRole );
+                $wholesalePrice = apply_filters( 'wwp_filter_wholesale_price_shop' , $wholesalePrice , $product->id , $userWholesaleRole );
 
-                if(strcasecmp($wholesalePrice,'') != 0)
-                    $wholesalePrice = '<span class="amount">'.wc_price($wholesalePrice) . $product->get_price_suffix().'</span>';
+                if ( strcasecmp( $wholesalePrice , '' ) != 0 )
+                    $wholesalePrice = '<span class="amount">' . wc_price( $wholesalePrice ) . $product->get_price_suffix() . '</span>';
 
-            } elseif ($product->product_type == 'variable') {
+            } elseif ( $product->product_type == 'variable' ) {
 
                 $variations = $product->get_available_variations();
                 $minPrice = '';
                 $maxPrice = '';
                 $someVariationsHaveWholesalePrice = false;
 
-                foreach($variations as $variation){
+                foreach ( $variations as $variation ) {
 
-                    $variation = wc_get_product($variation['variation_id']);
+                    if ( !$variation[ 'is_purchasable' ] )
+                        continue;
 
-                    $currVarWholesalePrice = trim($this->getUserProductWholesalePrice($variation->variation_id,$userWholesaleRole));
+                    $variation = wc_get_product( $variation[ 'variation_id' ] );
+
+                    $currVarWholesalePrice = trim( $this->getUserProductWholesalePrice( $variation->variation_id , $userWholesaleRole ) );
 
                     $currVarWholesalePrice = apply_filters( 'wwp_filter_wholesale_price_shop' , $currVarWholesalePrice, $variation->variation_id, $userWholesaleRole );
 
-                    $currVarPrice = $variation->price;
+                    $currVarPrice = $variation->get_display_price();
 
-                    if($variation->is_on_sale())
-                        $currVarPrice = $variation->get_sale_price();
-
-                    if(strcasecmp($currVarWholesalePrice,'') != 0){
+                    if ( strcasecmp( $currVarWholesalePrice , '' ) != 0 ) {
                         $currVarPrice = $currVarWholesalePrice;
 
-                        if(!$someVariationsHaveWholesalePrice)
+                        if ( !$someVariationsHaveWholesalePrice )
                             $someVariationsHaveWholesalePrice = true;
                     }
 
-                    if(strcasecmp($minPrice,'') == 0 || $currVarPrice < $minPrice)
+                    if ( strcasecmp( $minPrice , '' ) == 0 || $currVarPrice < $minPrice )
                         $minPrice = $currVarPrice;
 
-                    if(strcasecmp($maxPrice,'') == 0 || $currVarPrice > $maxPrice)
+                    if ( strcasecmp( $maxPrice , '' ) == 0 || $currVarPrice > $maxPrice )
                         $maxPrice = $currVarPrice;
 
                 }
 
                 // Only alter price html if, some/all variations of this variable product have sale price and
                 // min and max price have valid values
-                if($someVariationsHaveWholesalePrice && strcasecmp($minPrice,'') != 0 && strcasecmp($maxPrice,'') != 0){
+                if( $someVariationsHaveWholesalePrice && strcasecmp( $minPrice , '' ) != 0 && strcasecmp( $maxPrice , '' ) != 0 ) {
 
-                    if($minPrice != $maxPrice && $minPrice < $maxPrice){
-                        $wholesalePrice = '<span class="amount">'.wc_price($minPrice) . $product->get_price_suffix().'</span> - ';
-                        $wholesalePrice .= '<span class="amount">'.wc_price($maxPrice) . $product->get_price_suffix().'</span>';
-                    }else{
-                        $wholesalePrice = '<span class="amount">'.wc_price($maxPrice) . $product->get_price_suffix().'</span>';
-                    }
+                    if ( $minPrice != $maxPrice && $minPrice < $maxPrice ) {
+                        $wholesalePrice = wc_price( $minPrice ) . $product->get_price_suffix() . ' - ';
+                        $wholesalePrice .= wc_price( $maxPrice ) . $product->get_price_suffix();
+                    } else
+                        $wholesalePrice = wc_price( $maxPrice ) . $product->get_price_suffix();
 
                 }
 
             }
 
-            if(strcasecmp($wholesalePrice,'') != 0){
+            if ( strcasecmp( $wholesalePrice , '' ) != 0 ) {
 
                 // Crush out existing prices, regular and sale
-                if (strpos($price,'ins') !== false){
-                    $wholesalePriceHTML = str_replace('ins','del',$price);
-                }else{
-                    $wholesalePriceHTML = str_replace('<span','<del><span',$price);
-                    $wholesalePriceHTML = str_replace('</span>','</span></del>',$wholesalePriceHTML);
+                if ( strpos( $price , 'ins') !== false ) {
+                    $wholesalePriceHTML = str_replace( 'ins' , 'del' , $price );
+                } else {
+                    $wholesalePriceHTML = str_replace( '<span' , '<del><span' , $price );
+                    $wholesalePriceHTML = str_replace( '</span>' , '</span></del>' , $wholesalePriceHTML );
                 }
 
                 $wholesalePriceTitleText = 'Wholesale Price:';
-                $wholesalePriceTitleText = apply_filters('wwp_filter_wholesale_price_title_text',$wholesalePriceTitleText);
+                $wholesalePriceTitleText = apply_filters( 'wwp_filter_wholesale_price_title_text' , $wholesalePriceTitleText );
 
                 $wholesalePriceHTML .= '<div class="wholesale_price_container">
                                             <span class="wholesale_price_title">'.$wholesalePriceTitleText.'</span>
@@ -133,21 +132,107 @@ class WWP_Wholesale_Prices {
 
                 return apply_filters( 'wwp_filter_wholesale_price_html' , $wholesalePriceHTML , $price , $product , $userWholesaleRole );
 
-            }else{
+            }
 
-                // If wholesale price is empty (""), means that this product has no wholesale price set
-                // Just return the regular price
-                return $price;
+        }
+
+        // Only do this, if WooCommerce Wholesale Prices Premium plugin is installed
+        if ( in_array( 'woocommerce-wholesale-prices-premium/woocommerce-wholesale-prices-premium.bootstrap.php' , apply_filters( 'active_plugins', get_option( 'active_plugins' ) ) ) ) {
+
+            // Variable product price range calculation for none wholesale users -------------------------------------------
+
+            // Fix for the product price range if some variations are only to be displayed to certain wholesale roles
+            // If code below is not present, woocommerce will include in the min and max price calculation the variations
+            // that are not supposed to be displayed outside the set exclusive wholesale roles.
+            // Therefore giving misleading min and max price range.
+            if ( $product->product_type == 'variable' ) {
+
+                $variations = $product->get_available_variations();
+
+                $regularPriceRange = $this->_generateRegularVariableProductPriceRange( $product , $variations , 'regular' );
+                $salePriceRange = $this->_generateRegularVariableProductPriceRange( $product , $variations , 'sale' );
+
+                if ( $salePriceRange[ 'has_sale_price' ] )
+                    $price = '<del>' . $regularPriceRange[ 'price_range' ] . '</del> <ins>' . $salePriceRange[ 'price_range' ] . '</ins>';
+                else
+                    $price = $regularPriceRange[ 'price_range' ];
 
             }
 
-        }else{
+        }
 
-            // If $userWholeSaleRole is an empty array, meaning current user is not a wholesale customer,
-            // just return original $price html
-            return $price;
+        return $price;
+
+    }
+
+    /**
+     * The purpose for this helper function is to generate price range for none wholesale users for variable product.
+     * You see, default WooCommerce calculations include all variations of a product to general min and max price range.
+     *
+     * Now some variations have filters to be only visible to certain wholesale users ( Set by WWPP ). But WooCommerce
+     * Don't have an idea about this, so it will still include those variations to the min and max price range calculations
+     * thus giving incorrect price range.
+     *
+     * This is the purpose of this function, to generate a correct price range that recognizes the custom visibility filter
+     * of each variations.
+     *
+     * @param $product
+     * @param $variations
+     * @param string $range_type
+     * @return array
+     *
+     * @since 1.0.9
+     */
+    private function _generateRegularVariableProductPriceRange ( $product , $variations , $range_type = 'regular' ) {
+
+        $hasSalePrice = false;
+        $minPrice = '';
+        $maxPrice = '';
+
+        foreach( $variations as $variation ) {
+
+            if ( !$variation[ 'is_purchasable' ] )
+                continue;
+
+            $variation = wc_get_product( $variation[ 'variation_id' ] );
+
+            if ( $range_type == 'regular' )
+                $currVarPrice = $variation->get_display_price( $variation->get_regular_price() );
+            elseif ( $range_type == 'sale' ) {
+
+                // No point of going forward if no sale price
+                if ( !$hasSalePrice && $variation->get_regular_price() != $variation->get_price() )
+                    $hasSalePrice = true;
+
+                $currVarPrice = $variation->get_display_price( $variation->get_price() );
+
+            }
+
+            if( strcasecmp( $minPrice , '' ) == 0 || $currVarPrice < $minPrice )
+                $minPrice = $currVarPrice;
+
+            if( strcasecmp( $maxPrice , '' ) == 0 || $currVarPrice > $maxPrice )
+                $maxPrice = $currVarPrice;
 
         }
+
+        // Only alter price html if, some/all variations of this variable product have sale price and
+        // min and max price have valid values
+        if ( strcasecmp( $minPrice , '' ) != 0 && strcasecmp( $maxPrice , '' ) != 0 ) {
+
+            if ( $minPrice != $maxPrice && $minPrice < $maxPrice ) {
+                $priceRange =  wc_price( $minPrice ) . $product->get_price_suffix() . ' - ';
+                $priceRange .= wc_price( $maxPrice ) . $product->get_price_suffix();
+            } else {
+                $priceRange = wc_price( $maxPrice ) . $product->get_price_suffix();
+            }
+
+        }
+
+        return array(
+                    'price_range'       =>  $priceRange,
+                    'has_sale_price'    =>  $hasSalePrice
+                );
 
     }
 

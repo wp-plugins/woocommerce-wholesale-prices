@@ -80,80 +80,82 @@ class WWP_Custom_Fields {
      *
      * @since 1.0.1
      */
-    public function addWholesalePriceListingColumnData($column, $post_id, $registeredCustomRoles){
+    public function addWholesalePriceListingColumnData ( $column , $post_id , $registeredCustomRoles ) {
         switch ( $column ) {
-            case 'wholesale_price':
-                ?>
+            case 'wholesale_price': ?>
+
                 <div class="wholesale_prices" id="wholesale_prices_<?php echo $post_id; ?>">
-                    <?php
-                    $product = wc_get_product($post_id);
+
+                    <?php $product = wc_get_product($post_id);
 
                     foreach ( $registeredCustomRoles as $roleKey => $role ) {
 
-                        // If single product, this will have a value, empty if variable product
-                        $wholesalePrice = get_post_meta($post_id, $roleKey . '_wholesale_price', true);
+                        $wholesalePrice = "";
 
-                        if ( empty( $wholesalePrice ) ) {
+                        if ( $product->product_type == 'simple' ) {
 
-                            // Check for variations
-                            if ($product->product_type == 'variable') {
-                                $variations = $product->get_available_variations();
-                                $minPrice = '';
-                                $maxPrice = '';
-                                $someVariationsHaveWholesalePrice = false;
+                            $wholesalePrice = get_post_meta( $post_id , $roleKey . '_wholesale_price' , true );
 
-                                foreach( $variations as $variation ) {
+                            if ( $wholesalePrice )
+                                $wholesalePrice = wc_price( $wholesalePrice );
 
-                                    $variation = wc_get_product($variation['variation_id']);
+                        } elseif ( $product->product_type == 'variable' ) {
 
-                                    $currVarWholesalePrice = get_post_meta($variation->variation_id, $roleKey . '_wholesale_price', true);
+                            $variations = $product->get_available_variations();
+                            $minPrice = '';
+                            $maxPrice = '';
+                            $someVariationsHaveWholesalePrice = false;
 
-                                    $currVarPrice = $variation->price;
+                            foreach( $variations as $variation ) {
 
-                                    if($variation->is_on_sale())
-                                        $currVarPrice = $variation->get_sale_price();
+                                $variation = wc_get_product( $variation[ 'variation_id' ] );
 
-                                    if(strcasecmp($currVarWholesalePrice,'') != 0){
-                                        $currVarPrice = $currVarWholesalePrice;
+                                $currVarWholesalePrice = get_post_meta( $variation->variation_id , $roleKey . '_wholesale_price' , true );
 
-                                        if(!$someVariationsHaveWholesalePrice)
-                                            $someVariationsHaveWholesalePrice = true;
-                                    }
+                                $currVarPrice = $variation->price;
 
-                                    if(strcasecmp($minPrice,'') == 0 || $currVarPrice < $minPrice)
-                                        $minPrice = $currVarPrice;
+                                if ( $variation->is_on_sale() )
+                                    $currVarPrice = $variation->get_sale_price();
 
-                                    if(strcasecmp($maxPrice,'') == 0 || $currVarPrice > $maxPrice)
-                                        $maxPrice = $currVarPrice;
+                                if ( strcasecmp($currVarWholesalePrice ,'' ) != 0 ) {
+                                    $currVarPrice = $currVarWholesalePrice;
 
+                                    if( !$someVariationsHaveWholesalePrice )
+                                        $someVariationsHaveWholesalePrice = true;
                                 }
 
-                                if ($someVariationsHaveWholesalePrice && strcasecmp($minPrice,'') != 0 && strcasecmp($maxPrice,'') != 0){
+                                if( strcasecmp( $minPrice , '' ) == 0 || $currVarPrice < $minPrice )
+                                    $minPrice = $currVarPrice;
 
-                                    if ( $minPrice != $maxPrice && $minPrice < $maxPrice )
-                                        $wholesalePrice = wc_price( $minPrice ) . ' - ' . wc_price( $maxPrice );
-                                    else
-                                        $wholesalePrice = wc_price( $maxPrice );
+                                if( strcasecmp( $maxPrice , '' ) == 0 || $currVarPrice > $maxPrice )
+                                    $maxPrice = $currVarPrice;
 
-                                }
+                            }
 
-                            } else
-                                continue;
+                            if ( $someVariationsHaveWholesalePrice && strcasecmp( $minPrice , '' ) != 0 && strcasecmp( $maxPrice , '' ) != 0 ) {
+
+                                if ( $minPrice != $maxPrice && $minPrice < $maxPrice )
+                                    $wholesalePrice = wc_price( $minPrice ) . ' - ' . wc_price( $maxPrice );
+                                else
+                                    $wholesalePrice = wc_price( $maxPrice );
+
+                            }
 
                         } else
-                            $wholesalePrice = wc_price( $wholesalePrice ); ?>
+                            continue; ?>
 
                         <div id="<?php echo $roleKey; ?>_wholesale_price" class="wholesale_price">
                         <?php
+
                         // Print the wholesale price
-                        if ( empty( $wholesalePrice ) )
-                            echo $wholesalePrice;
-                        else
+                        if ( !empty( $wholesalePrice ) )
                             echo '<div class="wholesale_role">' . $role[ 'roleName' ] . '</div>' . $wholesalePrice;
+
                         ?>
                         </div>
 
                 <?php } ?>
+
                 </div>
                 <?php
 
