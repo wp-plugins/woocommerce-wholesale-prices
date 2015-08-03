@@ -8,10 +8,13 @@ class WWP_Wholesale_Roles {
 
     private static $_instance;
 
-    public static function getInstance(){
+    public static function getInstance() {
+
         if(!self::$_instance instanceof self)
             self::$_instance = new self;
+
         return self::$_instance;
+
     }
 
     /**
@@ -22,19 +25,19 @@ class WWP_Wholesale_Roles {
      *
      * @since 1.0.0
      */
-    public function addCustomRole($roleKey,$roleName){
+    public function addCustomRole( $roleKey , $roleName ) {
 
         global $wp_roles;
         if ( ! isset( $wp_roles ) )
             $wp_roles = new WP_Roles();
 
-        $customerRole = $wp_roles->get_role('customer'); // Copy customer role capabilities
+        $customerRole = $wp_roles->get_role( 'customer' ); // Copy customer role capabilities
 
-        do_action('wwp_action_before_add_custom_role',$roleKey,$roleName,$customerRole->capabilities);
+        do_action( 'wwp_action_before_add_custom_role' , $roleKey , $roleName , $customerRole->capabilities );
 
-        add_role( $roleKey, $roleName, $customerRole->capabilities );
+        add_role( $roleKey , $roleName , $customerRole->capabilities );
 
-        do_action('wwp_action_after_add_custom_role',$roleKey,$roleName,$customerRole->capabilities);
+        do_action( 'wwp_action_after_add_custom_role' , $roleKey , $roleName , $customerRole->capabilities );
 
     }
 
@@ -46,14 +49,14 @@ class WWP_Wholesale_Roles {
      *
      * @since 1.0.0
      */
-    public function addCustomCapability($roleKey,$cap){
+    public function addCustomCapability( $roleKey , $cap ) {
 
-        do_action('wwp_action_before_add_custom_cap',$roleKey,$cap);
+        do_action( 'wwp_action_before_add_custom_cap' , $roleKey , $cap );
 
         $role = get_role( $roleKey );
         $role->add_cap( $cap );
 
-        do_action('wwp_action_after_add_custom_cap',$roleKey,$cap);
+        do_action( 'wwp_action_after_add_custom_cap' , $roleKey , $cap );
 
     }
 
@@ -64,13 +67,13 @@ class WWP_Wholesale_Roles {
      *
      * @since 1.0.0
      */
-    public function removeCustomRole($roleKey){
+    public function removeCustomRole( $roleKey ) {
 
-        do_action('wwp_action_before_remove_custom_role',$roleKey);
+        do_action( 'wwp_action_before_remove_custom_role' , $roleKey );
 
         remove_role( $roleKey );
 
-        do_action('wwp_action_after_remove_custom_role',$roleKey);
+        do_action( 'wwp_action_after_remove_custom_role' , $roleKey );
 
     }
 
@@ -82,14 +85,16 @@ class WWP_Wholesale_Roles {
      *
      * @since 1.0.0
      */
-    public function removeCustomCapability($roleKey,$cap){
+    public function removeCustomCapability ( $roleKey , $cap ) {
 
-        do_action('wwp_action_before_remove_custom_cap',$roleKey,$cap);
+        do_action( 'wwp_action_before_remove_custom_cap' , $roleKey , $cap );
 
         $role = get_role( $roleKey );
-        $role->remove_cap( $cap );
 
-        do_action('wwp_action_after_remove_custom_cap',$roleKey,$cap);
+        if ( $role instanceof WP_Role )
+            $role->remove_cap( $cap );
+
+        do_action( 'wwp_action_after_remove_custom_cap' , $roleKey , $cap );
 
     }
 
@@ -103,23 +108,23 @@ class WWP_Wholesale_Roles {
      *
      * @since 1.0.0
      */
-    public function registerCustomRole($roleKey,$roleName,$attr){
+    public function registerCustomRole( $roleKey, $roleName , $attr ) {
 
-        do_action('wwp_action_before_register_custom_role',$roleKey,$roleName);
+        do_action( 'wwp_action_before_register_custom_role' , $roleKey , $roleName );
 
-        $registeredCustomRoles = unserialize(get_option(WWP_OPTIONS_REGISTERED_CUSTOM_ROLES));
+        $registeredCustomRoles = unserialize( get_option( WWP_OPTIONS_REGISTERED_CUSTOM_ROLES ) );
 
-        $newRole = array('roleName' => $roleName);
-        foreach($attr as $attKey => $attVal)
-            $newRole[$attKey] = $attVal;
+        $newRole = array( 'roleName' => $roleName );
+        foreach( $attr as $attKey => $attVal )
+            $newRole[ $attKey ] = $attVal;
 
         $newRole = apply_filters( 'wwp_filter_new_role', $newRole, $roleKey);
 
-        $registeredCustomRoles[$roleKey] = $newRole;
+        $registeredCustomRoles[ $roleKey ] = $newRole;
 
-        update_option(WWP_OPTIONS_REGISTERED_CUSTOM_ROLES,serialize($registeredCustomRoles));
+        update_option( WWP_OPTIONS_REGISTERED_CUSTOM_ROLES , serialize( $registeredCustomRoles ) );
 
-        do_action('wwp_action_after_register_custom_role',$roleKey,$roleName);
+        do_action( 'wwp_action_after_register_custom_role' , $roleKey , $roleName );
 
     }
 
@@ -131,18 +136,18 @@ class WWP_Wholesale_Roles {
      *
      * @since 1.0.0
      */
-    public function unregisterCustomRole($roleKey){
+    public function unregisterCustomRole ( $roleKey ) {
 
-        do_action('wwp_action_before_unregister_custom_role',$roleKey);
+        do_action( 'wwp_action_before_unregister_custom_role' , $roleKey );
 
-        $registeredCustomRoles = unserialize(get_option(WWP_OPTIONS_REGISTERED_CUSTOM_ROLES));
+        $registeredCustomRoles = unserialize( get_option( WWP_OPTIONS_REGISTERED_CUSTOM_ROLES ) );
 
-        if(is_array($registeredCustomRoles) && array_key_exists($roleKey,$registeredCustomRoles));
-            unset($registeredCustomRoles[$roleKey]);
+        if( is_array( $registeredCustomRoles ) && array_key_exists( $roleKey , $registeredCustomRoles ) );
+            unset( $registeredCustomRoles[ $roleKey ] );
 
-        update_option(WWP_OPTIONS_REGISTERED_CUSTOM_ROLES,serialize($registeredCustomRoles));
+        update_option( WWP_OPTIONS_REGISTERED_CUSTOM_ROLES , serialize( $registeredCustomRoles ) );
 
-        do_action('wwp_action_after_unregister_custom_role',$roleKey);
+        do_action( 'wwp_action_after_unregister_custom_role' , $roleKey );
 
     }
 
@@ -154,9 +159,9 @@ class WWP_Wholesale_Roles {
      *
      * @since 1.0.0
      */
-    public function getAllRegisteredWholesaleRoles(){
+    public function getAllRegisteredWholesaleRoles() {
 
-        return unserialize(get_option(WWP_OPTIONS_REGISTERED_CUSTOM_ROLES));
+        return unserialize( get_option( WWP_OPTIONS_REGISTERED_CUSTOM_ROLES ) );
 
     }
 
@@ -167,11 +172,11 @@ class WWP_Wholesale_Roles {
      *
      * @since 1.0.0
      */
-    public function getAllRoles(){
+    public function getAllRoles() {
 
         global $wp_roles;
 
-        if(!isset($wp_roles))
+        if( !isset( $wp_roles ) )
             $wp_roles = new WP_Roles();
 
         return $wp_roles->get_names();
@@ -185,7 +190,7 @@ class WWP_Wholesale_Roles {
      *
      * @since 1.0.0
      */
-    public function getUserRoles(){
+    public function getUserRoles() {
 
         global $current_user;
         return $current_user->roles;
@@ -199,14 +204,14 @@ class WWP_Wholesale_Roles {
      *
      * @since 1.0.0
      */
-    public function getUserWholesaleRole(){
+    public function getUserWholesaleRole() {
 
         $wholesaleRoleKeys = array();
 
-        foreach($this->getAllRegisteredWholesaleRoles() as $roleKey => $roleName)
+        foreach( $this->getAllRegisteredWholesaleRoles() as $roleKey => $roleName )
             $wholesaleRoleKeys[] = $roleKey;
 
-        return array_intersect($this->getUserRoles(),$wholesaleRoleKeys);
+        return array_intersect( $this->getUserRoles() , $wholesaleRoleKeys );
 
     }
 

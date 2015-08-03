@@ -6,9 +6,7 @@
  * @version     1.0.0
  */
 
-if ( ! defined( 'ABSPATH' ) ) {
-    exit; // Exit if accessed directly
-}
+if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 
 if ( ! class_exists( 'WWP_Settings' ) ) {
 
@@ -39,7 +37,7 @@ if ( ! class_exists( 'WWP_Settings' ) ) {
          */
         public function get_sections() {
 
-            $generalSettingsSectionTitle = __( '' , 'woocommerce-wholesale-prices' );
+            $generalSettingsSectionTitle = '';
 
             $sections = array(
                             ''  =>  apply_filters( 'wwp_filter_settings_general_section_title' , $generalSettingsSectionTitle )
@@ -116,8 +114,8 @@ if ( ! class_exists( 'WWP_Settings' ) ) {
             // Custom attribute handling
             $custom_attributes = array();
 
-            if ( ! empty( $value['custom_attributes'] ) && is_array( $value['custom_attributes'] ) ) {
-                foreach ( $value['custom_attributes'] as $attribute => $attribute_value ) {
+            if ( ! empty( $value[ 'custom_attributes' ] ) && is_array( $value[ 'custom_attributes' ] ) ) {
+                foreach ( $value[ 'custom_attributes' ] as $attribute => $attribute_value ) {
                     $custom_attributes[] = esc_attr( $attribute ) . '="' . esc_attr( $attribute_value ) . '"';
                 }
             }
@@ -129,8 +127,8 @@ if ( ! class_exists( 'WWP_Settings' ) ) {
                     <img src="<?php echo WWP_IMAGES_URL ?>woocommerce-wholesale-prices-upgrade-notice.jpg" alt=""/>
                 </th>
                 <th class="forminp forminp-<?php echo sanitize_title( $value['type'] ); ?>">
-                    <a style="display: inline-block; outline: none; margin-bottom: 30px;" target="_blank" href="https://wholesalesuiteplugin.com/product/woocommerce-wholesale-prices-premium/?utm_source=Free%20Plugin&utm_medium=Settings&utm_campaign=Premium%20Upsell"><img src="<?php echo WWP_IMAGES_URL ?>wholesale-suite-upsell-banner.jpg" alt="WooCommerce Wholesale Suit"/></a>
-                    <a style="display: inline-block; outline: none;" target="_blank" href="https://wholesalesuiteplugin.com/?utm_source=Free%20Plugin&utm_medium=Settings&utm_campaign=Suite%20Upsell"><img src="<?php echo WWP_IMAGES_URL ?>wholesale-suite-prices-upsell-banner.jpg" alt="WooCommerce Wholesale Prices Premium"/></a>
+                    <a style="display: inline-block; outline: none; margin-bottom: 30px;" target="_blank" href="https://wholesalesuiteplugin.com/product/woocommerce-wholesale-prices-premium/?utm_source=Free%20Plugin&utm_medium=Settings&utm_campaign=Premium%20Upsell"><img src="<?php echo WWP_IMAGES_URL ?>wholesale-suite-upsell-banner.jpg" alt="<?php _e( 'WooCommerce Wholesale Suite' , 'woocommerce-wholesale-prices' ); ?>"/></a>
+                    <a style="display: inline-block; outline: none;" target="_blank" href="https://wholesalesuiteplugin.com/?utm_source=Free%20Plugin&utm_medium=Settings&utm_campaign=Suite%20Upsell"><img src="<?php echo WWP_IMAGES_URL ?>wholesale-suite-prices-upsell-banner.jpg" alt="<?php _e( 'WooCommerce Wholesale Prices Premium' , 'woocommerce-wholesale-prices' ); ?>"/></a>
                 </th>
             </tr>
 

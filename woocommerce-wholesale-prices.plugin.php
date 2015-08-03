@@ -1,5 +1,5 @@
 <?php
-if (!defined('ABSPATH')) exit; // Exit if accessed directly
+if ( !defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 
 /**
  * This is the main plugin class. It's purpose generally is for "ALL PLUGIN RELATED STUFF ONLY".
@@ -9,9 +9,9 @@ if (!defined('ABSPATH')) exit; // Exit if accessed directly
  * Class WooCommerceWholeSalePrices
  */
 
-require_once ('includes/class-wwp-wholesale-roles.php');
-require_once ('includes/class-wwp-custom-fields.php');
-require_once ('includes/class-wwp-wholesale-prices.php');
+require_once ( 'includes/class-wwp-wholesale-roles.php' );
+require_once ( 'includes/class-wwp-custom-fields.php' );
+require_once ( 'includes/class-wwp-wholesale-prices.php' );
 
 class WooCommerceWholeSalePrices {
 
@@ -27,7 +27,7 @@ class WooCommerceWholeSalePrices {
     private $_wwp_custom_fields;
     private $_wwp_wholesale_prices;
 
-    const VERSION = '1.0.9';
+    const VERSION = '1.1.0';
 
 
 
@@ -43,7 +43,7 @@ class WooCommerceWholeSalePrices {
      *
      * @since 1.0.0
      */
-    public function __construct(){
+    public function __construct() {
 
         $this->_wwp_wholesale_roles = WWP_Wholesale_Roles::getInstance();
         $this->_wwp_custom_fields = WWP_Custom_Fields::getInstance();
@@ -58,11 +58,32 @@ class WooCommerceWholeSalePrices {
      *
      * @return WooCommerceWholeSalePrices
      */
-    public static function getInstance(){
+    public static function getInstance() {
 
-        if(!self::$_instance instanceof self)
+        if( !self::$_instance instanceof self )
             self::$_instance = new self;
+
         return self::$_instance;
+
+    }
+
+
+
+
+    /*
+     |------------------------------------------------------------------------------------------------------------------
+     | Internationalization and Localization
+     |------------------------------------------------------------------------------------------------------------------
+     */
+
+    /**
+     * Load plugin text domain.
+     *
+     * @since 1.2.0
+     */
+    public function loadPluginTextDomain () {
+
+        load_plugin_textdomain( 'woocommerce-wholesale-prices' , false , WWP_LANGUAGES_PATH );
 
     }
 
@@ -83,14 +104,14 @@ class WooCommerceWholeSalePrices {
     public function init() {
 
         // Add plugin custom roles and capabilities
-        $this->_wwp_wholesale_roles->addCustomRole('wholesale_customer','Wholesale Customer');
-        $this->_wwp_wholesale_roles->registerCustomRole('wholesale_customer',
-                                                        'Wholesale Customer',
+        $this->_wwp_wholesale_roles->addCustomRole( 'wholesale_customer' , __( 'Wholesale Customer' , 'woocommerce-wholesale-prices' ) );
+        $this->_wwp_wholesale_roles->registerCustomRole( 'wholesale_customer' ,
+                                                         __( 'Wholesale Customer' , 'woocommerce-wholesale-prices' ) ,
                                                         array(
-                                                            'desc'  =>  'This is the main wholesale user role.',
+                                                            'desc'  =>  __( 'This is the main wholesale user role.' , 'woocommerce-wholesale-prices' ),
                                                             'main'  =>  true
                                                         ));
-        $this->_wwp_wholesale_roles->addCustomCapability('wholesale_customer','have_wholesale_price');
+        $this->_wwp_wholesale_roles->addCustomCapability( 'wholesale_customer' , 'have_wholesale_price' );
 
         // Get all wholesale roles
         $allWholesaleRoles = $this->_wwp_wholesale_roles->getAllRegisteredWholesaleRoles();
@@ -274,7 +295,7 @@ class WooCommerceWholeSalePrices {
      */
     public function uninstall () {
 
-        // Uninstallation codes here if any ...
+        // Un-installation codes here if any ...
 
     }
 
@@ -294,18 +315,18 @@ class WooCommerceWholeSalePrices {
      *
      * @param $handle
      */
-    public function loadBackEndStylesAndScripts($handle){
+    public function loadBackEndStylesAndScripts( $handle ) {
         // Only plugin styles and scripts on the right time and on the right place
 
         // Styles
-        wp_enqueue_style('wwp_wcoverrides_css', WWP_CSS_URL.'wwp-back-end-wcoverrides.css', array(), self::VERSION, 'all');
+        wp_enqueue_style( 'wwp_wcoverrides_css' , WWP_CSS_URL . 'wwp-back-end-wcoverrides.css' , array() , self::VERSION , 'all' );
 
         // Scripts
         $screen = get_current_screen();
 
         // Products
-        if ( in_array( $screen->id, array( 'edit-product' ) ) ) {
-            wp_enqueue_script( 'wwp_quick_edit', WWP_JS_URL . 'wc/wwp-quick-edit.js', array('jquery'), self::VERSION );
+        if ( in_array( $screen->id , array( 'edit-product' ) ) ) {
+            wp_enqueue_script( 'wwp_quick_edit' , WWP_JS_URL . 'wc/wwp-quick-edit.js' , array('jquery' ), self::VERSION );
         }
 
     }
@@ -317,7 +338,7 @@ class WooCommerceWholeSalePrices {
      *
      * @since 1.0.0
      */
-    public function loadFrontEndStylesAndScripts($handle){
+    public function loadFrontEndStylesAndScripts( $handle ) {
         // Only plugin styles and scripts on the right time and on the right place
     }
 
@@ -326,7 +347,7 @@ class WooCommerceWholeSalePrices {
      *
      * @since 1.0.0
      */
-    public function registerMenu(){
+    public function registerMenu() {
 
     }
 
@@ -346,7 +367,7 @@ class WooCommerceWholeSalePrices {
      */
     public function activatePluginSettings () {
 
-        add_filter( "woocommerce_get_settings_pages" , array( self::getInstance() ,'initializePluginSettings' ) );
+        add_filter( "woocommerce_get_settings_pages" , array( self::getInstance() , 'initializePluginSettings' ) );
 
     }
 
@@ -360,7 +381,7 @@ class WooCommerceWholeSalePrices {
      */
     public function initializePluginSettings ( $settings ) {
 
-        $settings[] = include( WWP_INCLUDES_PATH."class-wwp-settings.php" );
+        $settings[] = include( WWP_INCLUDES_PATH . "class-wwp-settings.php" );
 
         return $settings;
 
@@ -394,8 +415,8 @@ class WooCommerceWholeSalePrices {
         if ( $current_section == '' ) {
 
             // Filters Section
-            $wwpGeneralSettings = apply_filters( 'wwp_settings_general_section_settings', $this->_get_general_section_settings() ) ;
-            $settings = array_merge( $settings, $wwpGeneralSettings );
+            $wwpGeneralSettings = apply_filters( 'wwp_settings_general_section_settings' , $this->_get_general_section_settings() ) ;
+            $settings = array_merge( $settings , $wwpGeneralSettings );
 
         }
 
@@ -410,12 +431,12 @@ class WooCommerceWholeSalePrices {
      *
      * @since 1.0.1
      */
-    private function _get_general_section_settings(){
+    private function _get_general_section_settings() {
 
         return array(
 
             array(
-                'name'  =>  __( 'Wholesale Prices Settings', 'woocommerce-wholesale-prices' ),
+                'name'  =>  __( 'Wholesale Prices Settings' , 'woocommerce-wholesale-prices' ),
                 'type'  =>  'title',
                 'desc'  =>  '',
                 'id'    =>  'wwp_settings_section_title'
@@ -449,9 +470,9 @@ class WooCommerceWholeSalePrices {
      *
      * @since 1.0.0
      */
-    public function addSimpleProductCustomFields(){
+    public function addSimpleProductCustomFields() {
 
-        $this->_wwp_custom_fields->addSimpleProductCustomFields($this->_wwp_wholesale_roles->getAllRegisteredWholesaleRoles());
+        $this->_wwp_custom_fields->addSimpleProductCustomFields( $this->_wwp_wholesale_roles->getAllRegisteredWholesaleRoles() );
 
     }
 
@@ -464,7 +485,7 @@ class WooCommerceWholeSalePrices {
      *
      * @since 1.0.0
      */
-    public function addVariableProductCustomFields ( $loop , $variation_data , $variation ){
+    public function addVariableProductCustomFields ( $loop , $variation_data , $variation ) {
 
         $this->_wwp_custom_fields->addVariableProductCustomFields ( $loop , $variation_data , $variation , $this->_wwp_wholesale_roles->getAllRegisteredWholesaleRoles() );
 
@@ -475,9 +496,9 @@ class WooCommerceWholeSalePrices {
      *
      * @since 1.0.0
      */
-    public function addVariableProductCustomFieldsJS(){
+    public function addVariableProductCustomFieldsJS() {
 
-        $this->_wwp_custom_fields->addVariableProductCustomFieldsJS($this->_wwp_wholesale_roles->getAllRegisteredWholesaleRoles());
+        $this->_wwp_custom_fields->addVariableProductCustomFieldsJS( $this->_wwp_wholesale_roles->getAllRegisteredWholesaleRoles() );
 
     }
 
@@ -488,9 +509,9 @@ class WooCommerceWholeSalePrices {
      *
      * @since 1.0.0
      */
-    public function saveSimpleProductCustomFields($post_id){
+    public function saveSimpleProductCustomFields ( $post_id ) {
 
-        $this->_wwp_custom_fields->saveSimpleProductCustomFields($post_id,$this->_wwp_wholesale_roles->getAllRegisteredWholesaleRoles());
+        $this->_wwp_custom_fields->saveSimpleProductCustomFields( $post_id , $this->_wwp_wholesale_roles->getAllRegisteredWholesaleRoles() );
 
     }
 
@@ -503,7 +524,7 @@ class WooCommerceWholeSalePrices {
      */
     public function saveVariableProductCustomFields( $post_id ) {
 
-        $this->_wwp_custom_fields->saveVariableProductCustomFields($post_id,$this->_wwp_wholesale_roles->getAllRegisteredWholesaleRoles());
+        $this->_wwp_custom_fields->saveVariableProductCustomFields( $post_id , $this->_wwp_wholesale_roles->getAllRegisteredWholesaleRoles() );
 
     }
 
@@ -514,7 +535,7 @@ class WooCommerceWholeSalePrices {
      */
     public function addCustomWholesaleFieldsOnQuickEditScreen(){
 
-        $this->_wwp_custom_fields->addCustomWholesaleFieldsOnQuickEditScreen($this->_wwp_wholesale_roles->getAllRegisteredWholesaleRoles());
+        $this->_wwp_custom_fields->addCustomWholesaleFieldsOnQuickEditScreen( $this->_wwp_wholesale_roles->getAllRegisteredWholesaleRoles() );
 
     }
 
@@ -525,9 +546,9 @@ class WooCommerceWholeSalePrices {
      *
      * @since 1.0.0
      */
-    public function saveCustomWholesaleFieldsOnQuickEditScreen($product){
+    public function saveCustomWholesaleFieldsOnQuickEditScreen( $product ) {
 
-        $this->_wwp_custom_fields->saveCustomWholesaleFieldsOnQuickEditScreen($product,$this->_wwp_wholesale_roles->getAllRegisteredWholesaleRoles());
+        $this->_wwp_custom_fields->saveCustomWholesaleFieldsOnQuickEditScreen( $product , $this->_wwp_wholesale_roles->getAllRegisteredWholesaleRoles() );
 
     }
 
@@ -541,22 +562,22 @@ class WooCommerceWholeSalePrices {
      *
      * @since 1.0.0
      */
-    public function addCustomWholesaleFieldsMetaDataOnProductListingColumn($column,$post_id){
+    public function addCustomWholesaleFieldsMetaDataOnProductListingColumn( $column , $post_id ) {
 
-        $this->_wwp_custom_fields->addCustomWholesaleFieldsMetaDataOnProductListingColumn($column,$post_id,$this->_wwp_wholesale_roles->getAllRegisteredWholesaleRoles());
+        $this->_wwp_custom_fields->addCustomWholesaleFieldsMetaDataOnProductListingColumn( $column , $post_id , $this->_wwp_wholesale_roles->getAllRegisteredWholesaleRoles() );
 
     }
 
     /**
-     * Add wholesale price column to the product listing page
+     * Add wholesale price column to the product listing page.
      *
      * @param $columns
      *
-     * @since 1.0.1
+     * @return array
      */
-    public function addWholesalePriceListingColumn($columns){
+    public function addWholesalePriceListingColumn( $columns ) {
 
-        return $this->_wwp_custom_fields->addWholesalePriceListingColumn($columns);
+        return $this->_wwp_custom_fields->addWholesalePriceListingColumn( $columns );
 
     }
 
@@ -568,9 +589,10 @@ class WooCommerceWholeSalePrices {
      *
      * @since 1.0.1
      */
-    public function addWholesalePriceListingColumnData($column, $post_id){
-        $registeredCustomRoles = unserialize(get_option(WWP_OPTIONS_REGISTERED_CUSTOM_ROLES));
-        return $this->_wwp_custom_fields->addWholesalePriceListingColumnData($column, $post_id, $registeredCustomRoles);
+    public function addWholesalePriceListingColumnData( $column , $post_id ) {
+
+        $registeredCustomRoles = unserialize( get_option( WWP_OPTIONS_REGISTERED_CUSTOM_ROLES ) );
+        return $this->_wwp_custom_fields->addWholesalePriceListingColumnData( $column , $post_id , $registeredCustomRoles );
 
     }
 
@@ -614,9 +636,9 @@ class WooCommerceWholeSalePrices {
      * @return mixed|string
      * @since 1.0.0
      */
-    public function wholesalePriceHTMLFilter($price, $product){
+    public function wholesalePriceHTMLFilter( $price , $product ) {
 
-        return $this->_wwp_wholesale_prices->wholesalePriceHTMLFilter($price,$product,$this->_wwp_wholesale_roles->getUserWholesaleRole());
+        return $this->_wwp_wholesale_prices->wholesalePriceHTMLFilter( $price , $product , $this->_wwp_wholesale_roles->getUserWholesaleRole() );
 
     }
 
@@ -644,7 +666,7 @@ class WooCommerceWholeSalePrices {
      *
      * @since 1.0.0
      */
-    public function applyProductWholesalePrice($cart_object){
+    public function applyProductWholesalePrice( $cart_object ) {
 
         $this->_wwp_wholesale_prices->applyProductWholesalePrice( $cart_object , $this->_wwp_wholesale_roles->getUserWholesaleRole() );
 
@@ -660,7 +682,7 @@ class WooCommerceWholeSalePrices {
      *
      * @since 1.0.0
      */
-    public function applyProductWholesalePriceOnDefaultWCCartWidget ( $product_price, $cart_item, $cart_item_key ) {
+    public function applyProductWholesalePriceOnDefaultWCCartWidget ( $product_price , $cart_item , $cart_item_key ) {
 
         return $this->_wwp_wholesale_prices->applyProductWholesalePriceOnDefaultWCCartWidget( $product_price , $cart_item , $cart_item_key , $this->_wwp_wholesale_roles->getUserWholesaleRole() );
 
@@ -683,6 +705,41 @@ class WooCommerceWholeSalePrices {
 
     /*
      |------------------------------------------------------------------------------------------------------------------
+     | Public Interfaces
+     |------------------------------------------------------------------------------------------------------------------
+     */
+
+    /**
+     * Returns an array that contains the wholesale role of the user. Usually 1 item only.
+     *
+     * @return array
+     *
+     * @since 1.2.0
+     */
+    public function getUserWholesaleRole () {
+
+        return $this->_wwp_wholesale_roles->getUserWholesaleRole();
+
+    }
+
+    /**
+     * Returns an array of all registered wholesale roles.
+     *
+     * @return mixed
+     *
+     * @since 1.2.0
+     */
+    public function getAllWholesaleRoles () {
+
+        return $this->_wwp_wholesale_roles->getAllRegisteredWholesaleRoles();
+
+    }
+
+
+
+
+    /*
+     |------------------------------------------------------------------------------------------------------------------
      | AJAX Handlers
      |------------------------------------------------------------------------------------------------------------------
      */
@@ -692,7 +749,7 @@ class WooCommerceWholeSalePrices {
      *
      * @since 1.0.0
      */
-    public function registerAJAXCAllHandlers(){
+    public function registerAJAXCAllHandlers() {
 
     }
 
@@ -713,12 +770,12 @@ class WooCommerceWholeSalePrices {
      *
      * @since 1.0.0
      */
-    public function writeTestLog($msg,$append = true){
+    public function writeTestLog( $msg , $append = true ) {
 
-        if($append === true)
-            file_put_contents(WWP_LOGS_PATH.'test_logs.txt',$msg,FILE_APPEND);
+        if( $append === true )
+            file_put_contents( WWP_LOGS_PATH . 'test_logs.txt' , $msg , FILE_APPEND );
         else
-            file_put_contents(WWP_LOGS_PATH.'test_logs.txt',$msg);
+            file_put_contents( WWP_LOGS_PATH . 'test_logs.txt' , $msg );
 
     }
 
@@ -730,12 +787,12 @@ class WooCommerceWholeSalePrices {
      *
      * @since 1.0.0
      */
-    public function writeErrorLog($msg,$append = true){
+    public function writeErrorLog( $msg , $append = true ) {
 
-        if($append === true)
-            file_put_contents(WWP_LOGS_PATH.'error_logs.txt',$msg,FILE_APPEND);
+        if( $append === true )
+            file_put_contents( WWP_LOGS_PATH . 'error_logs.txt' , $msg , FILE_APPEND );
         else
-            file_put_contents(WWP_LOGS_PATH.'error_logs.txt',$msg);
+            file_put_contents( WWP_LOGS_PATH . 'error_logs.txt' , $msg );
 
     }
 

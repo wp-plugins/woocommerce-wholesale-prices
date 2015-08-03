@@ -1,17 +1,17 @@
 <?php
-
-if ( ! defined( 'ABSPATH' ) ) {
-    exit; // Exit if accessed directly
-}
+if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 
 class WWP_Wholesale_Prices {
 
     private static $_instance;
 
-    public static function getInstance(){
-        if(!self::$_instance instanceof self)
+    public static function getInstance() {
+
+        if( !self::$_instance instanceof self )
             self::$_instance = new self;
+
         return self::$_instance;
+
     }
 
     /**
@@ -23,7 +23,7 @@ class WWP_Wholesale_Prices {
      * @return string
      * @since 1.0.0
      */
-    public function getUserProductWholesalePrice($product_id, $userWholesaleRole){
+    public function getUserProductWholesalePrice( $product_id , $userWholesaleRole ) {
 
         if ( empty( $userWholesaleRole ) ) {
 
@@ -31,8 +31,8 @@ class WWP_Wholesale_Prices {
 
         } else {
 
-            $wholesalePrice = get_post_meta($product_id,$userWholesaleRole[0].'_wholesale_price',true);
-            return apply_filters( 'wwp_filter_wholesale_price', $wholesalePrice, $product_id, $userWholesaleRole );
+            $wholesalePrice = get_post_meta( $product_id , $userWholesaleRole[0] . '_wholesale_price' , true );
+            return apply_filters( 'wwp_filter_wholesale_price' , $wholesalePrice , $product_id , $userWholesaleRole );
 
         }
 
@@ -48,7 +48,7 @@ class WWP_Wholesale_Prices {
      * @return mixed|string
      * @since 1.0.0
      */
-    public function wholesalePriceHTMLFilter($price, $product, $userWholesaleRole){
+    public function wholesalePriceHTMLFilter( $price , $product , $userWholesaleRole ) {
 
         if ( !empty( $userWholesaleRole ) ) {
 
@@ -61,7 +61,7 @@ class WWP_Wholesale_Prices {
                 $wholesalePrice = apply_filters( 'wwp_filter_wholesale_price_shop' , $wholesalePrice , $product->id , $userWholesaleRole );
 
                 if ( strcasecmp( $wholesalePrice , '' ) != 0 )
-                    $wholesalePrice = '<span class="amount">' . wc_price( $wholesalePrice ) . $product->get_price_suffix() . '</span>';
+                    $wholesalePrice = wc_price( $wholesalePrice ) . $product->get_price_suffix();
 
             } elseif ( $product->product_type == 'variable' ) {
 
@@ -110,6 +110,8 @@ class WWP_Wholesale_Prices {
 
                 }
 
+                $wholesalePrice = apply_filters( 'wwp_filter_variable_product_wholesale_price_range' , $wholesalePrice , $price , $product , $userWholesaleRole , $minPrice , $maxPrice );
+
             }
 
             if ( strcasecmp( $wholesalePrice , '' ) != 0 ) {
@@ -122,7 +124,7 @@ class WWP_Wholesale_Prices {
                     $wholesalePriceHTML = str_replace( '</span>' , '</span></del>' , $wholesalePriceHTML );
                 }
 
-                $wholesalePriceTitleText = 'Wholesale Price:';
+                $wholesalePriceTitleText = __( 'Wholesale Price:' , 'woocommerce-wholesale-prices' );
                 $wholesalePriceTitleText = apply_filters( 'wwp_filter_wholesale_price_title_text' , $wholesalePriceTitleText );
 
                 $wholesalePriceHTML .= '<div class="wholesale_price_container">
@@ -229,6 +231,8 @@ class WWP_Wholesale_Prices {
 
         }
 
+        $priceRange = apply_filters( 'wwp_filter_variable_product_price_range' , $priceRange , $product , $variations , $range_type , $minPrice , $maxPrice );
+
         return array(
                     'price_range'       =>  $priceRange,
                     'has_sale_price'    =>  $hasSalePrice
@@ -253,7 +257,7 @@ class WWP_Wholesale_Prices {
         if( !empty( $userWholesaleRole ) ) {
 
             $currVarWholesalePrice = trim( $this->getUserProductWholesalePrice( $variation->variation_id , $userWholesaleRole ) );
-            $currVarWholesalePrice = apply_filters( 'wwp_filter_wholesale_price_shop' , $currVarWholesalePrice, $variation->variation_id, $userWholesaleRole );
+            $currVarWholesalePrice = apply_filters( 'wwp_filter_wholesale_price_shop' , $currVarWholesalePrice , $variation->variation_id , $userWholesaleRole );
 
             $currVarPrice = $variation->price;
 
@@ -263,29 +267,29 @@ class WWP_Wholesale_Prices {
             if(strcasecmp($currVarWholesalePrice,'') != 0)
                 $currVarPrice = $currVarWholesalePrice;
 
-            $wholesalePrice = '<span class="amount">' . wc_price( $currVarPrice ) . $variation->get_price_suffix() . '</span>';
+            $wholesalePrice = wc_price( $currVarPrice ) . $variation->get_price_suffix();
 
             if ( strcasecmp( $currVarWholesalePrice , '' ) != 0 ) {
 
                 // Crush out existing prices, regular and sale
-                if (strpos($price,'ins') !== false){
-                    $wholesalePriceHTML = str_replace('ins','del',$price);
-                }else{
-                    $wholesalePriceHTML = str_replace('<span','<del><span',$price);
-                    $wholesalePriceHTML = str_replace('</span>','</span></del>',$wholesalePriceHTML);
+                if ( strpos( $price , 'ins' ) !== false ) {
+                    $wholesalePriceHTML = str_replace( 'ins' , 'del' , $price );
+                } else {
+                    $wholesalePriceHTML = str_replace( '<span' , '<del><span',$price );
+                    $wholesalePriceHTML = str_replace( '</span>' , '</span></del>' , $wholesalePriceHTML );
                 }
 
-                $wholesalePriceTitleText = 'Wholesale Price:';
-                $wholesalePriceTitleText = apply_filters('wwp_filter_wholesale_price_title_text',$wholesalePriceTitleText);
+                $wholesalePriceTitleText = __( 'Wholesale Price:' , 'woocommerce-wholesale-prices' );
+                $wholesalePriceTitleText = apply_filters( 'wwp_filter_wholesale_price_title_text' , $wholesalePriceTitleText );
 
                 $wholesalePriceHTML .= '<div class="wholesale_price_container">
                                             <span class="wholesale_price_title">'.$wholesalePriceTitleText.'</span>
                                             <ins>' . $wholesalePrice . '</ins>
                                         </div>';
 
-                return apply_filters( 'wwp_filter_wholesale_price_html', $wholesalePriceHTML, $price, $variation, $userWholesaleRole );
+                return apply_filters( 'wwp_filter_wholesale_price_html' , $wholesalePriceHTML , $price , $variation , $userWholesaleRole );
 
-            }else{
+            } else {
 
                 // If wholesale price is empty (""), means that this product has no wholesale price set
                 // Just return the regular price
@@ -493,7 +497,7 @@ class WWP_Wholesale_Prices {
 
             // Print notice why a wholesale user is not qualified for a wholesale price
             // Only print on cart page ( Have some side effects when printed on checkout page )
-            wc_print_notice( $notices['message'] , $notices[ 'type' ] );
+            wc_print_notice( $notices[ 'message' ] , $notices[ 'type' ] );
 
         } elseif ( is_array( $notices ) ) {
             // Version 1.2.0 of wwpp where it sends back multiple notice via multi dimensional arrays

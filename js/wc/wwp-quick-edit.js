@@ -1,5 +1,5 @@
-jQuery(function(){
-    jQuery('#the-list').on('click', '.editinline', function(){
+jQuery( function () {
+    jQuery( '#the-list' ).on( 'click' , '.editinline' , function() {
 
         /**
          * Bottom Line:
@@ -15,29 +15,29 @@ jQuery(function(){
          */
         inlineEditPost.revert();
 
-        var post_id = jQuery(this).closest('tr').attr('id');
+        var post_id = jQuery( this ).closest( 'tr' ).attr( 'id' );
 
-        post_id = post_id.replace("post-", "");
+        post_id = post_id.replace( "post-" , "" );
 
-        var $wwop_inline_data = jQuery('#wholesale_prices_inline_' + post_id),
-            $wc_inline_data = jQuery('#woocommerce_inline_' + post_id );
+        var $wwop_inline_data = jQuery( '#wholesale_prices_inline_' + post_id ),
+            $wc_inline_data = jQuery( '#woocommerce_inline_' + post_id );
 
-        $wwop_inline_data.find(".whole_price")
-            .each(function(index){
+        $wwop_inline_data.find( ".whole_price" )
+            .each( function( index ) {
 
-                jQuery('input[name="'+jQuery(this).attr('id')+'"]', '.inline-edit-row').val(jQuery(this).text());
+                jQuery( 'input[name="' + jQuery(this) . attr( 'id' ) + '"]' , '.inline-edit-row' ) . val( jQuery( this ).text() );
 
             });
 
         /**
          * Only show wholesale price custom field for appropriate types of products (simple)
          */
-        var product_type = $wc_inline_data.find('.product_type').text();
+        var product_type = $wc_inline_data.find( '.product_type' ).text();
 
-        if (product_type=='simple' || product_type=='external') {
-            jQuery('.quick_edit_wholesale_prices', '.inline-edit-row').show();
+        if ( product_type=='simple' || product_type=='external' ) {
+            jQuery( '.quick_edit_wholesale_prices' , '.inline-edit-row' ).show();
         } else {
-            jQuery('.quick_edit_wholesale_prices', '.inline-edit-row').hide();
+            jQuery( '.quick_edit_wholesale_prices' , '.inline-edit-row' ).hide();
         }
 
     });

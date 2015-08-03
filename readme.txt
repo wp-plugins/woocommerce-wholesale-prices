@@ -67,6 +67,11 @@ https://wholesalesuiteplugin.com/product/woocommerce-wholesale-prices-premium/
 
 == Changelog ==
 
+= 1.1.0 =
+* Improvement: Add additional helper functions
+* Improvement: Enhance cleaning up procedures on deactivation
+* Improvement: Translation ready
+
 = 1.0.9 =
 * Bug Fix: Properly display wholesale pricing when changing product types
 * Bug Fix: Properly display product price range for variable products
