@@ -66,6 +66,8 @@ Plenty of amazing screenshots for this plugin and more over at:
 https://wholesalesuiteplugin.com/product/woocommerce-wholesale-prices-premium/
 
 == Changelog ==
+= 1.1.1 =
+* Bug Fix: Fix price suffix doubling up on variable products
 
 = 1.1.0 =
 * Improvement: Add additional helper functions

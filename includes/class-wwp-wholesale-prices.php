@@ -61,7 +61,7 @@ class WWP_Wholesale_Prices {
                 $wholesalePrice = apply_filters( 'wwp_filter_wholesale_price_shop' , $wholesalePrice , $product->id , $userWholesaleRole );
 
                 if ( strcasecmp( $wholesalePrice , '' ) != 0 )
-                    $wholesalePrice = wc_price( $wholesalePrice ) . $product->get_price_suffix();
+                    $wholesalePrice = wc_price( $wholesalePrice ) . apply_filters( 'wwp_filter_wholesale_price_display_suffix' , $product->get_price_suffix() );
 
             } elseif ( $product->product_type == 'variable' ) {
 
@@ -102,11 +102,10 @@ class WWP_Wholesale_Prices {
                 // min and max price have valid values
                 if( $someVariationsHaveWholesalePrice && strcasecmp( $minPrice , '' ) != 0 && strcasecmp( $maxPrice , '' ) != 0 ) {
 
-                    if ( $minPrice != $maxPrice && $minPrice < $maxPrice ) {
-                        $wholesalePrice = wc_price( $minPrice ) . $product->get_price_suffix() . ' - ';
-                        $wholesalePrice .= wc_price( $maxPrice ) . $product->get_price_suffix();
-                    } else
-                        $wholesalePrice = wc_price( $maxPrice ) . $product->get_price_suffix();
+                    if ( $minPrice != $maxPrice && $minPrice < $maxPrice )
+                        $wholesalePrice = wc_price( $minPrice ) . ' - ' . wc_price( $maxPrice ) . apply_filters( 'wwp_filter_wholesale_price_display_suffix' , $product->get_price_suffix() );
+                    else
+                        $wholesalePrice = wc_price( $maxPrice ) . apply_filters( 'wwp_filter_wholesale_price_display_suffix' , $product->get_price_suffix() );
 
                 }
 
@@ -127,12 +126,12 @@ class WWP_Wholesale_Prices {
                 $wholesalePriceTitleText = __( 'Wholesale Price:' , 'woocommerce-wholesale-prices' );
                 $wholesalePriceTitleText = apply_filters( 'wwp_filter_wholesale_price_title_text' , $wholesalePriceTitleText );
 
-                $wholesalePriceHTML .= '<div class="wholesale_price_container">
-                                            <span class="wholesale_price_title">'.$wholesalePriceTitleText.'</span>
+                $wholesalePriceHTML .= '<span style="display: block;" class="wholesale_price_container">
+                                            <span class="wholesale_price_title">' . $wholesalePriceTitleText . '</span>
                                             <ins>' . $wholesalePrice . '</ins>
-                                        </div>';
+                                        </span>';
 
-                return apply_filters( 'wwp_filter_wholesale_price_html' , $wholesalePriceHTML , $price , $product , $userWholesaleRole );
+                return apply_filters( 'wwp_filter_wholesale_price_html' , $wholesalePriceHTML , $price , $product , $userWholesaleRole , $wholesalePriceTitleText , $wholesalePrice );
 
             }
 
@@ -222,12 +221,10 @@ class WWP_Wholesale_Prices {
         // min and max price have valid values
         if ( strcasecmp( $minPrice , '' ) != 0 && strcasecmp( $maxPrice , '' ) != 0 ) {
 
-            if ( $minPrice != $maxPrice && $minPrice < $maxPrice ) {
-                $priceRange =  wc_price( $minPrice ) . $product->get_price_suffix() . ' - ';
-                $priceRange .= wc_price( $maxPrice ) . $product->get_price_suffix();
-            } else {
+            if ( $minPrice != $maxPrice && $minPrice < $maxPrice )
+                $priceRange =  wc_price( $minPrice ) . ' - ' . wc_price( $maxPrice ) . $product->get_price_suffix();
+            else
                 $priceRange = wc_price( $maxPrice ) . $product->get_price_suffix();
-            }
 
         }
 
@@ -267,7 +264,7 @@ class WWP_Wholesale_Prices {
             if(strcasecmp($currVarWholesalePrice,'') != 0)
                 $currVarPrice = $currVarWholesalePrice;
 
-            $wholesalePrice = wc_price( $currVarPrice ) . $variation->get_price_suffix();
+            $wholesalePrice = wc_price( $currVarPrice ) . apply_filters( 'wwp_filter_wholesale_price_display_suffix' , $variation->get_price_suffix() );
 
             if ( strcasecmp( $currVarWholesalePrice , '' ) != 0 ) {
 
@@ -282,12 +279,12 @@ class WWP_Wholesale_Prices {
                 $wholesalePriceTitleText = __( 'Wholesale Price:' , 'woocommerce-wholesale-prices' );
                 $wholesalePriceTitleText = apply_filters( 'wwp_filter_wholesale_price_title_text' , $wholesalePriceTitleText );
 
-                $wholesalePriceHTML .= '<div class="wholesale_price_container">
-                                            <span class="wholesale_price_title">'.$wholesalePriceTitleText.'</span>
+                $wholesalePriceHTML .= '<span style="display: block;" class="wholesale_price_container">
+                                            <span class="wholesale_price_title">' . $wholesalePriceTitleText . '</span>
                                             <ins>' . $wholesalePrice . '</ins>
-                                        </div>';
+                                        </span>';
 
-                return apply_filters( 'wwp_filter_wholesale_price_html' , $wholesalePriceHTML , $price , $variation , $userWholesaleRole );
+                return apply_filters( 'wwp_filter_wholesale_price_html' , $wholesalePriceHTML , $price , $variation , $userWholesaleRole , $wholesalePriceTitleText , $wholesalePrice );
 
             } else {
 
